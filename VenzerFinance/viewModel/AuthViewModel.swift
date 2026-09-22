@@ -15,6 +15,7 @@ class AuthViewModel:ObservableObject {
         self.context = context
     }
     
+    @discardableResult
     func loginUser(email:String, password:String) -> Bool {
         if let context {
             let request = User.fetchRequest()
@@ -29,6 +30,7 @@ class AuthViewModel:ObservableObject {
         return false
     }
     
+    @discardableResult
     func createUser(email:String, password:String, name:String, country:String) -> Bool{
         if let context {
             let user = User(context: context)
@@ -43,5 +45,10 @@ class AuthViewModel:ObservableObject {
             return true
         }
         return false
+    }
+    
+    func logOut() {
+        UserDefaults.standard.removeObject(forKey: Constants.appStateUserKey.rawValue)
+        AppState.shared.updateUser(user: nil, isLoggedIn: false)
     }
 }

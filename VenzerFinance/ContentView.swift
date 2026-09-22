@@ -12,65 +12,30 @@ struct ContentView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject private var appState = AppState.shared
+    @StateObject private var authViewModel:AuthViewModel
     
-    @StateObject private var authViewModel:AuthViewModel 
     init(context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
-            _authViewModel = StateObject(wrappedValue: AuthViewModel(context: context))
-        }
+        _authViewModel = StateObject(wrappedValue: AuthViewModel(context: context))
+    }
+    
     var body: some View {
         ZStack {
             
-            // Global background gradient
-            LinearGradient(
-                colors: [
-                    Color.clear,
-                    Color("BackgroundColor").opacity(0.5),
-                    Color("BackgroundColor").opacity(0.15),
-                    Color("BackgroundColor").opacity(0.6)
-                ],
-                startPoint: .topTrailing,
-                endPoint: .bottomLeading
-            )
-            .ignoresSafeArea()
-            
-            // Global watermark "V" shapes
-            GeometryReader { proxy in
-                ZStack {
-                    Text("v")
-                        .font(.system(size: proxy.size.width * 1.8, weight: .bold))
-                        .foregroundColor(Color.black.opacity(0.025))
-                        .rotationEffect(.degrees(-261))
-                        .offset(
-                            x: proxy.size.width * 0.85,
-                            y: -proxy.size.height * 0.3
-                        )
-                    
-                    Text("v")
-                        .font(.system(size: proxy.size.width * 1.8, weight: .bold))
-                        .foregroundColor(Color.black.opacity(0.025))
-                        .rotationEffect(.degrees(-27))
-                        .offset(
-                            x: -proxy.size.width * 0.5,
-                            y: -proxy.size.height * 0.7
-                        )
-                }
-                .allowsHitTesting(false)
-                
-                Group {
-                    if appState.isLoggedIn {
-                        subView()
-                    } else {
-                        AuthView()
-                    }
+            Group {
+                if appState.isLoggedIn {
+                    subView()
+                } else {
+                    AuthView()
                 }
             }
-            
+        }
+        .background {
+            CustomBackgroundView()
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .environmentObject(authViewModel)
     }
 }
-
 
 struct subView: View {
     @State private var currentTab: Tab = .home
@@ -96,11 +61,11 @@ struct subView: View {
             
             // Custom bottom tab bar
             BottomNavigation(currentTab: $currentTab)
-                .padding(.bottom, 10)
+                .padding(.bottom, 3)
         }
     }
 }
 
-//#Preview {
-//    ContentView()
-//}
+#Preview {
+    ContentView()
+}

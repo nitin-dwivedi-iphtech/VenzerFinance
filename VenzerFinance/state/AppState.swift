@@ -30,7 +30,7 @@ class AppState: ObservableObject {
         return true
     }
     
-    func updateUser(user:User, isLoggedIn:Bool) {
+    func updateUser(user:User?, isLoggedIn:Bool) {
         self.user = user
         self.isLoggedIn = isLoggedIn
     }
