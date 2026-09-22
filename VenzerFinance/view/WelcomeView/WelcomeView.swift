@@ -17,7 +17,8 @@ struct WelcomeView: View {
             VStack(spacing: 16) {
                 header
                 welcomeSection
-                if welcomeViewModel.account != nil {
+                // MARK: - For Testing Only
+//                if welcomeViewModel.account != nil {
                     accountCard
                         .padding(.horizontal, 20)
                     
@@ -26,17 +27,17 @@ struct WelcomeView: View {
                         recentTransactionCard
                     }
                     .padding(.horizontal, 20)
-                } else {
-                    Spacer()
-                    VStack {
-                        
-                        Text("Account not found!!")
-                            .font(.system(size: 15))
-                        Text("Please add new account in settings")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.gray)
-                    }
-                }
+//                } else {
+//                    Spacer()
+//                    VStack {
+//                        
+//                        Text("Account not found!!")
+//                            .font(.system(size: 15))
+//                        Text("Please add new account in settings")
+//                            .font(.system(size: 10))
+//                            .foregroundStyle(.gray)
+//                    }
+//                }
                 Spacer()
             }
         }

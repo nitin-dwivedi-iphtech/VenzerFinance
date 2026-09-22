@@ -39,6 +39,7 @@ struct ContentView: View {
 
 struct subView: View {
     @State private var currentTab: Tab = .home
+
     var body: some View {
         ZStack(alignment: .bottom) {
             // Tab content switcher
@@ -53,8 +54,7 @@ struct subView: View {
                     Text("Chart View")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 case .setting:
-                    Text("Setting View")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    SettingView()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -63,6 +63,7 @@ struct subView: View {
             BottomNavigation(currentTab: $currentTab)
                 .padding(.bottom, 3)
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 }
 

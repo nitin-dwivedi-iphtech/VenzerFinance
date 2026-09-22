@@ -18,13 +18,7 @@ class WelcomeViewModel:ObservableObject {
     }
     
     private func fetchAccount() {
-        guard let userID = user?.id else { return }
-        
-        let request: NSFetchRequest<Account> = Account.fetchRequest()
-        request.predicate = NSPredicate(format: "user_id == %@", userID as CVarArg)
-        request.fetchLimit = 1
-        let data = try? context.fetch(request)
-        self.account = data?.first
+        self.account = DbService.shared.fetchAccount(for: user)
         
     }
 }

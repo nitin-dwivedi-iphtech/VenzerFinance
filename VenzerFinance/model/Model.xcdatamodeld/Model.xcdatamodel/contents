@@ -23,6 +23,7 @@
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="password" optional="YES" attributeType="String"/>
+        <attribute name="phone" optional="YES" attributeType="String"/>
         <relationship name="user_account_relation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Account" inverseName="account_user_relation" inverseEntity="Account"/>
     </entity>
 </model>
