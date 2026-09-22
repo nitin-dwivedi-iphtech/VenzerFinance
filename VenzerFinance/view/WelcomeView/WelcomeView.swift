@@ -8,22 +8,35 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    @StateObject var welcomeViewModel:WelcomeViewModel = WelcomeViewModel()
     @State var showCurrencyConverterView:Bool = false
+    
     
     var body: some View {
         ScrollView(showsIndicators:false){
             VStack(spacing: 16) {
                 header
                 welcomeSection
-                accountCard
+                if welcomeViewModel.account != nil {
+                    accountCard
+                        .padding(.horizontal, 20)
+                    
+                    HStack(spacing: 12) {
+                        expenseCard
+                        recentTransactionCard
+                    }
                     .padding(.horizontal, 20)
-                
-                HStack(spacing: 12) {
-                    expenseCard
-                    recentTransactionCard
+                } else {
+                    Spacer()
+                    VStack {
+                        
+                        Text("Account not found!!")
+                            .font(.system(size: 15))
+                        Text("Please add new account in settings")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.gray)
+                    }
                 }
-                .padding(.horizontal, 20)
-                
                 Spacer()
             }
         }
@@ -57,7 +70,7 @@ struct WelcomeView: View {
             Button(action: {
                 showCurrencyConverterView = true
             }) {
-                Image(systemName: "slider.horizontal.3")
+                Image(systemName: "coloncurrencysign.arrow.trianglehead.counterclockwise.rotate.90")
                     .font(.title3)
                     .foregroundStyle(.black)
             }
@@ -80,7 +93,7 @@ struct WelcomeView: View {
     
     var welcomeSection: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text("Hi Jon Snow,")
+            Text("Hi \(welcomeViewModel.user?.name ?? "User"),")
                 .font(.system(size: 13))
             Text("Welcome Back!")
                 .font(.system(size: 35, weight: .light))
@@ -104,7 +117,7 @@ struct WelcomeView: View {
                 .frame(height: 70)
                 .overlay(alignment: .top) {
                     HStack(spacing: 2) {
-                        Text("Jon Snow")
+                        Text("\(welcomeViewModel.user?.name ?? "User")")
                             .font(.system(size: 15))
                             .bold()
                             .foregroundStyle(.black)
