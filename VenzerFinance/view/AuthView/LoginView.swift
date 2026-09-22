@@ -11,7 +11,9 @@ struct LoginView:View {
     @State private var password: String = ""
     @State private var isPasswordVisible: Bool = false
     @Binding var signUp:Bool
-    var authViewModel:AuthViewModel
+    @Binding var isLoading:Bool
+    
+    @EnvironmentObject var authViewModel: AuthViewModel
     
     var body: some View {
         VStack(spacing: 24) {
@@ -73,9 +75,11 @@ struct LoginView:View {
             
             // Signin button
             Button(action: {
+                isLoading = true
                 if Helper.isFormValid(for:[email, password]) {
                     authViewModel.loginUser(email: email, password: password)
                 }
+                isLoading = false
             }) {
                 Text("Sign In")
                     .font(.system(size: 16, weight: .bold))

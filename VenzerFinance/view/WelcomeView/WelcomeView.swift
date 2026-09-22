@@ -8,25 +8,41 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    @State var showCurrencyConverterView:Bool = false
+    
     var body: some View {
-        
-            
-            ScrollView(showsIndicators:false){
-                VStack(spacing: 16) {
-                    header
-                    welcomeSection
-                    accountCard
-                        .padding(.horizontal, 20)
-                    
-                    HStack(spacing: 12) {
-                        expenseCard
-                        recentTransactionCard
-                    }
+        ScrollView(showsIndicators:false){
+            VStack(spacing: 16) {
+                header
+                welcomeSection
+                accountCard
                     .padding(.horizontal, 20)
-                    
-                    Spacer()
+                
+                HStack(spacing: 12) {
+                    expenseCard
+                    recentTransactionCard
                 }
+                .padding(.horizontal, 20)
+                
+                Spacer()
             }
+        }
+        .fullScreenCover(isPresented: $showCurrencyConverterView) {
+            NavigationStack {
+                CurrencyConverterView()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button(action: {
+                                showCurrencyConverterView = false
+                            }) {
+                                Image(systemName: "arrow.left")
+                                    .font(.system(size: 22))
+                                    .foregroundStyle(.gray.opacity(0.6))
+                            }
+                        }
+                    }
+            }
+        }
         
     }
     
@@ -38,7 +54,9 @@ struct WelcomeView: View {
             
             Spacer()
             
-            Button(action: {}) {
+            Button(action: {
+                showCurrencyConverterView = true
+            }) {
                 Image(systemName: "slider.horizontal.3")
                     .font(.title3)
                     .foregroundStyle(.black)
@@ -46,13 +64,14 @@ struct WelcomeView: View {
             .padding(10)
             .background(.white.opacity(0.67), in: Circle())
             
+            
             Image("image")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 42, height: 42)
                 .clipShape(Circle())
                 .onTapGesture {
-                    
+                    // handle action to open setting view
                 }
         }
         .padding(.vertical, 10)

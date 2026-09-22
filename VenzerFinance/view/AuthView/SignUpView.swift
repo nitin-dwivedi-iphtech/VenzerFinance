@@ -15,7 +15,9 @@ struct SignUpView:View {
     @State private var country:Country = .india
     @State private var isPasswordVisible: Bool = false
     @Binding var signUp:Bool
-    var authViewModel:AuthViewModel
+    @Binding var isLoading:Bool
+    
+    @EnvironmentObject var authViewModel: AuthViewModel
     
     var body: some View {
         VStack(spacing: 24) {
@@ -100,9 +102,11 @@ struct SignUpView:View {
             
             // Signin button
             Button(action: {
+                isLoading = true
                 if Helper.isFormValid(for: [email, password, name, country.rawValue]) {
                     authViewModel.createUser(email: email, password: password, name: name, country: country.rawValue)
                 }
+                isLoading = false
             }) {
                 Text("Sign Up")
                     .font(.system(size: 16, weight: .bold))
