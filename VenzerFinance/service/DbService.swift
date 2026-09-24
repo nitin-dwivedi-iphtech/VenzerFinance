@@ -12,7 +12,7 @@ import CoreData
 class DbService: ObservableObject {
     static var shared = DbService()
     var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
-
+    
     func fetchAccount(for user: User?) -> Account? {
         guard let userID = user?.id else { return nil }
         let request: NSFetchRequest<Account> = Account.fetchRequest()
@@ -21,7 +21,7 @@ class DbService: ObservableObject {
         let data = try? context.fetch(request)
         return data?.first
     }
-
+    
     // Accounts
     @discardableResult
     func saveAccountDetails(accountNo: String, bankName: String, balanceText: String, for user: User?, existingAccount: Account?) -> Account {
@@ -41,12 +41,13 @@ class DbService: ObservableObject {
         context.saveData()
         return account
     }
-
+    
     // Personal Details
     func updatePersonalDetails(for user: User, fullName: String, email: String, phone: String) {
         user.name = fullName.trimmingCharacters(in: .whitespacesAndNewlines)
         user.email = email.trimmingCharacters(in: .whitespacesAndNewlines)
         user.phone = phone.trimmingCharacters(in: .whitespacesAndNewlines)
         context.saveData()
+        
     }
 }

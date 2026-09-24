@@ -36,10 +36,10 @@ struct SettingView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
                     // hero with user and account
-                    ProfileHeroCard(user: viewModel.user, account: viewModel.account)
-                    AccountStatusCard(account: viewModel.account)
-                    PersonalDetailsCard(user: viewModel.user)
-                    AccountDetailsCard(user: viewModel.user, account: viewModel.account)
+                    ProfileHeroCard(viewModel: viewModel)
+                    AccountStatusCard(viewModel: viewModel)
+                    PersonalDetailsCard(user: viewModel.user, viewModel: viewModel)
+                    AccountDetailsCard(user: viewModel.user, account: viewModel.account, viewModel: viewModel)
                     PreferencesCard(user: viewModel.user)
                     AppVersionFooter()
                 }
@@ -51,6 +51,9 @@ struct SettingView: View {
             .ignoresSafeArea(edges: .bottom)
         }
         .background { CustomBackgroundView() }
+        .onAppear {
+            viewModel.refresh()
+        }
     }
 }
 

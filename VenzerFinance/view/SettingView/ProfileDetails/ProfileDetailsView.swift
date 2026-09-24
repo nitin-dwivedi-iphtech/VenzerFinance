@@ -9,8 +9,8 @@ import SwiftUI
 
 struct PersonalDetailsView: View {
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel = PersonalDetailsViewModel()
-    
+    @ObservedObject  var viewModel:SettingViewModel
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 16) {
@@ -156,8 +156,8 @@ struct PersonalDetailsView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        PersonalDetailsView()
-    }
-}
+//#Preview {
+//    NavigationStack {
+//        PersonalDetailsView()
+//    }
+//}

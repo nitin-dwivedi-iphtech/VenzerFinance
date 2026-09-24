@@ -10,8 +10,7 @@ import SwiftUI
 
 //  hero card
 struct ProfileHeroCard: View {
-    var user: User?
-    var account: Account?
+    @ObservedObject var viewModel: SettingViewModel
 
     var body: some View {
         VStack(spacing: 14) {
@@ -48,10 +47,10 @@ struct ProfileHeroCard: View {
                     .overlay(Circle().stroke(Color.white, lineWidth: 3))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(user?.name ?? "—").font(.system(size: 16, weight: .bold)).foregroundColor(.black).lineLimit(1)
-                    Text(user?.email ?? "—").font(.system(size: 12)).foregroundColor(.black.opacity(0.6)).lineLimit(1)
+                    Text(viewModel.user?.name ?? "—").font(.system(size: 16, weight: .bold)).foregroundColor(.black).lineLimit(1)
+                    Text(viewModel.user?.name ?? "—").font(.system(size: 12)).foregroundColor(.black.opacity(0.6)).lineLimit(1)
 
-                    if let raw = user?.country, let c = Country(rawValue: raw) {
+                    if let raw = viewModel.user?.country, let c = Country(rawValue: raw) {
                         HStack(spacing: 6) {
                             Image(c.flagImageName).resizable().frame(width: 18, height: 18).clipShape(Circle())
                             Text("\(c.rawValue.capitalized) • \(c.currencyCode)").font(.system(size: 10, weight: .bold))
@@ -74,7 +73,7 @@ struct ProfileHeroCard: View {
         HStack(spacing: 10) {
             statBox(icon: "wallet.pass.fill", title: "Balance", value: getBalance())
             statBox(icon: "number.circle.fill", title: "Account", value: getShortNo())
-            statBox(icon: "building.columns.fill", title: "Bank", value: account?.bankName ?? "—")
+            statBox(icon: "building.columns.fill", title: "Bank", value: viewModel.account?.bankName ?? "—")
         }
     }
 
@@ -107,14 +106,14 @@ struct ProfileHeroCard: View {
     }
 
     private func getBalance() -> String {
-        guard let bal = account?.balance else { return "—" }
+        guard let bal = viewModel.account?.balance else { return "—" }
         let v = bal.doubleValue
         if v == 0 { return "0.00" }
         return String(format: "%.2f", v)
     }
 
     private func getShortNo() -> String {
-        guard let no = account?.account_no, !no.isEmpty else { return "—" }
+        guard let no = viewModel.account?.account_no, !no.isEmpty else { return "—" }
         if no.count > 12 { return "•••• \(no.suffix(4))" }
         return no
     }

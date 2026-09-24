@@ -9,13 +9,14 @@
 import SwiftUI
 
 struct AccountStatusCard: View {
-    var account: Account?
+    
+    @ObservedObject var viewModel: SettingViewModel
     
     var body: some View {
-        if account == nil {
+        if viewModel.account == nil {
             EmptyAccountCard()
         } else {
-            LinkedAccountCard(account: account!)
+            LinkedAccountCard(account: viewModel.account!)
         }
     }
 }
@@ -120,6 +121,8 @@ struct LinkedAccountCard: View {
 struct PersonalDetailsCard: View {
     var user: User?
     @State var showEditSheet:Bool = false
+    @ObservedObject  var viewModel:SettingViewModel
+
     var body: some View {
         SettingCardContainer(title: "Personal details", subtitle: "Your profile information", iconName: "person.fill", showEditBtn: true, onClick: {
             showEditSheet = true
@@ -135,7 +138,7 @@ struct PersonalDetailsCard: View {
             }
         }.sheet(isPresented: $showEditSheet){
             NavigationStack {
-                PersonalDetailsView()
+                PersonalDetailsView(viewModel: viewModel)
                     .presentationDetents([.medium, .large])
             }
         }
@@ -146,6 +149,7 @@ struct PersonalDetailsCard: View {
 struct AccountDetailsCard: View {
     var user: User?
     var account: Account?
+    @ObservedObject  var viewModel:SettingViewModel
     @State var showEditSheet:Bool = false
     var body: some View {
         SettingCardContainer(title: "Account details", subtitle: "Billing & plan information", iconName: "creditcard.fill", showEditBtn: true, onClick: {
@@ -167,7 +171,7 @@ struct AccountDetailsCard: View {
             }
         }.sheet(isPresented: $showEditSheet){
             NavigationStack {
-                AccountDetailsView()
+                AccountDetailsView(viewModel: viewModel)
                     .presentationDetents([.medium, .large])
             }
         }

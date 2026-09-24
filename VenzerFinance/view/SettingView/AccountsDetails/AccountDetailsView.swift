@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AccountDetailsView: View {
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel = AccountDetailsViewModel()
+    @ObservedObject var viewModel:SettingViewModel
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -182,6 +182,6 @@ struct AccountDetailsView: View {
     }
 }
 
-#Preview {
-    NavigationStack { AccountDetailsView() }
-}
+//#Preview {
+//    NavigationStack { AccountDetailsView() }
+//}
