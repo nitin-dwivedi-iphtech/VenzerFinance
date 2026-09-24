@@ -8,62 +8,89 @@
 import SwiftUI
 
 struct CurrencyConverterView: View {
-    @Environment(\.dismiss) var dismiss
-    @State var fromCountryCurrency:Country = .india
-    @State var toCountryCurrency:Country = .usa
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var fromCountryCurrency: Country = .india
+    @State private var toCountryCurrency: Country = .usa
     @State private var dragOffset: CGFloat = 0
     @State private var isConverted: Bool = false
+    @State private var showAmountSheet = false
     
+    @StateObject private var viewModel = CurrencyConverterViewModel()
+
     var body: some View {
-        ScrollView(showsIndicators:false){
+        ScrollView(showsIndicators: false) {
             VStack {
-                HStack(spacing: -8) {
-                    ForEach(Array(Country.allCases.enumerated()), id: \.element.id) { index, country in
-                        flagImage(flag: country.flagImageName)
-                            .zIndex(Double(Country.allCases.count - index))
-                    }
-                }
+                flagHeader
                 heading
+
+                amountButton
                 
-                VStack(spacing: -25){
-                    
+                VStack(spacing: -25) {
                     conversionCard(country: fromCountryCurrency, direction: .inward, from: true)
-                    
                     conversionCard(country: toCountryCurrency, direction: .inward, from: false)
-                }.overlay {
-                    Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                            let temp = fromCountryCurrency
-                            fromCountryCurrency = toCountryCurrency
-                            toCountryCurrency = temp
-                        }
-                    } label: {
-                        HStack{
-                            Image(systemName: "arrow.left.arrow.right")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.black)
-                            Text("Swap")
-                                .foregroundStyle(.black)
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical,10)
-                        .background(Capsule().fill(Color.white))
-                        .shadow(color: .white.opacity(0.15), radius: 4, y: 2)
-                    }
-                    .padding(.vertical, -12)
-                    .zIndex(1)
+                }
+                .overlay {
+                    swapButton
                 }
                 
                 expenseText
                 swipeActionView
+                
                 Spacer()
             }
         }
-        .background {
-            CustomBackgroundView()
+        .background { CustomBackgroundView() }
+        .task {
+            await viewModel.fetchRate(from: fromCountryCurrency, to: toCountryCurrency)
+        }
+        .onChange(of: fromCountryCurrency) { _, newFrom in
+            Task { await viewModel.fetchRate(from: newFrom, to: toCountryCurrency) }
+        }
+        .onChange(of: toCountryCurrency) { _, newTo in
+            Task { await viewModel.fetchRate(from: fromCountryCurrency, to: newTo) }
+        }
+        .sheet(isPresented: $showAmountSheet) {
+            AmountInputSheet(amountText: $viewModel.amountText, fromCountry: fromCountryCurrency, toCountry: toCountryCurrency, rate: viewModel.rate)
+                
         }
     }
     
+    // MARK: - Subviews
+    
+    private var flagHeader: some View {
+        HStack(spacing: -8) {
+            ForEach(Array(Country.allCases.enumerated()), id: \.element.id) { index, country in
+                flagImage(flag: country.flagImageName)
+                    .zIndex(Double(Country.allCases.count - index))
+            }
+        }
+    }
+    
+    private var swapButton: some View {
+        Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                let temp = fromCountryCurrency
+                fromCountryCurrency = toCountryCurrency
+                toCountryCurrency = temp
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "arrow.left.arrow.right")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.black)
+                Text("Swap")
+                    .foregroundStyle(.black)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .background(Capsule().fill(Color.white))
+            .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
+        }
+        .padding(.vertical, -12)
+        .zIndex(1)
+    }
+
     @ViewBuilder
     private func flagImage(flag: String) -> some View {
         Image(flag)
@@ -71,35 +98,52 @@ struct CurrencyConverterView: View {
             .scaledToFill()
             .frame(width: 40, height: 40)
             .clipShape(Circle())
-            .overlay(
-                Circle()
-                    .stroke(Color.white, lineWidth: 3)
-            )
+            .overlay(Circle().stroke(Color.white, lineWidth: 3))
             .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 2)
     }
-    
-    private var heading:some View {
+
+    private var heading: some View {
         VStack {
             Text("Currency Converter")
-                .font(.system(size: 28))
-                .fontWeight(.medium)
-            
+                .font(.system(size: 28, weight: .medium))
             Text("Instantly swaps between currencies worldwide")
                 .font(.system(size: 12))
                 .foregroundStyle(.gray)
-        }.padding(.vertical,10)
+        }
+        .padding(.vertical, 10)
     }
-    
+
+    private var amountButton: some View {
+        Button { showAmountSheet = true } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "pencil.circle.fill")
+                    .font(.system(size: 16))
+                    .foregroundColor(Color("CardColor"))
+                Text("Amount: \(fromCountryCurrency.currencySymbol)\(viewModel.amountText)")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.black)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.gray)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(Color.white, in: Capsule())
+            .overlay(Capsule().stroke(Color.black.opacity(0.06), lineWidth: 1))
+            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+        }
+        .padding(.bottom, 2)
+    }
+
     @ViewBuilder
-    private func conversionCard(country:Country, direction:NotchedCardShape.NotchDirection = .inward, from:Bool) -> some View {
-        
+    private func conversionCard(country: Country, direction: NotchedCardShape.NotchDirection = .inward, from: Bool) -> some View {
         let textColor: Color = from ? .black : .white
         let cardPosition: NotchedCardShape.NotchPosition = from ? .top : .bottom
         let backgroundColor: String = from ? "InsideCarBottomColor" : "CardColor"
         
         VStack {
             HStack {
-                Text(from == true ? "You Pay" : "You get")
+                Text(from ? "You Pay" : "You Get")
                     .font(.system(size: 15))
                     .foregroundStyle(textColor.opacity(0.7))
                 
@@ -117,22 +161,25 @@ struct CurrencyConverterView: View {
             
             HStack {
                 customPicker(selection: from ? $fromCountryCurrency : $toCountryCurrency)
-                    .padding(.trailing,5)
-                    .background (
-                        Color.white, in: Capsule()
-                    )
+                    .padding(.trailing, 5)
+                    .background(Color.white, in: Capsule())
                 
                 Spacer()
                 
-                HStack(spacing:0){
+                HStack(spacing: 2) {
                     Text(country.currencySymbol)
                         .foregroundStyle(textColor.opacity(0.5))
-                        .offset(y:-3)
+                        .offset(y: -3)
                     
-                    Text("4,309,573")
-                        .font(.system(size: 28))
-                        .fontWeight(.medium)
-                        .foregroundStyle(textColor)
+                    if from {
+                        Text(viewModel.amountText)
+                            .font(.system(size: 28, weight: .medium))
+                            .foregroundStyle(textColor)
+                    } else {
+                        Text(viewModel.getConvertedValue(from: fromCountryCurrency, to: toCountryCurrency))
+                            .font(.system(size: 28, weight: .medium))
+                            .foregroundStyle(textColor)
+                    }
                 }
             }
             
@@ -143,34 +190,30 @@ struct CurrencyConverterView: View {
                 
                 Spacer()
                 
-                HStack(spacing:0){
+                HStack(spacing: 2) {
                     Text(country.currencySymbol)
                         .font(.system(size: 10))
                         .foregroundStyle(textColor.opacity(0.6))
                     
-                    Text("4,309,573")
-                        .font(.system(size: 15))
-                        .fontWeight(.medium)
+                    Text(from ? viewModel.amountText : viewModel.getConvertedValue(from: fromCountryCurrency, to: toCountryCurrency))
+                        .font(.system(size: 15, weight: .medium))
                         .foregroundStyle(textColor.opacity(0.6))
                 }
-            }.padding(.vertical,8)
+            }
+            .padding(.vertical, 8)
         }
         .padding()
-        
         .background(Color(backgroundColor))
         .clipShape(NotchedCardShape(position: cardPosition, direction: direction))
         .padding()
     }
-    
+
     @ViewBuilder
     private func customPicker(selection: Binding<Country>) -> some View {
         Menu {
             Picker("Select Country", selection: selection) {
                 ForEach(Country.allCases) { item in
-                    HStack {
-                        Text("\(item.currencyCode) - \(item.currency    )")
-                    }
-                    .tag(item)
+                    Text("\(item.currencyCode) - \(item.currency)").tag(item)
                 }
             }
         } label: {
@@ -198,48 +241,46 @@ struct CurrencyConverterView: View {
             )
         }
     }
-    
+
     private var expenseText: some View {
         VStack {
             HStack {
-                Text("Exchnage Rate")
+                Text("Exchange Rate")
                     .font(.system(size: 15))
-                
                 Spacer()
-                
-                Text("1 \(fromCountryCurrency.currencyCode) = \(Helper.ExchangeRateHelper.rate(from: fromCountryCurrency, to: toCountryCurrency)) \(toCountryCurrency.currencyCode)")
+                Text("1 \(fromCountryCurrency.currencyCode) = \(String(format: "%.4f", viewModel.rate)) \(toCountryCurrency.currencyCode)")
                     .font(.system(size: 17))
-            }.padding(.horizontal)
+            }
+            .padding(.horizontal)
             
             HStack {
-                VStack(alignment:.leading) {
-                    Text("Exchnage Fee")
+                VStack(alignment: .leading) {
+                    Text("Exchange Fee")
                         .font(.system(size: 15))
-                    
                     Text("Applied based on amount & currency")
                         .font(.system(size: 13))
                         .foregroundStyle(.gray)
                 }
                 Spacer()
-                
-                Text("\(Helper.ExchangeRateHelper.currencyConversionCharges(for: fromCountryCurrency)) \(fromCountryCurrency.currencyCode)")
-            }.padding()
+                Text("\(Helper.ExchangeRateHelper.currencyConversionCharges(for: fromCountryCurrency, to: toCountryCurrency)) \(fromCountryCurrency.currencyCode)")
+            }
+            .padding()
             
             Divider().padding(.horizontal)
             
             HStack {
                 Text("Total")
                     .font(.system(size: 15))
-                
                 Spacer()
-                
-                Text("\(fromCountryCurrency.currencySymbol) 4,309,573") .font(.system(size: 17))
-            }.padding(.horizontal)
-                .padding(.vertical,5)
-            
-        }.padding()
+                Text("\(toCountryCurrency.currencySymbol) \(viewModel.getConvertedValue(from: fromCountryCurrency, to: toCountryCurrency))")
+                    .font(.system(size: 17))
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 5)
+        }
+        .padding()
     }
-    
+
     private var swipeActionView: some View {
         GeometryReader { geometry in
             let buttonDiameter: CGFloat = 44
@@ -277,14 +318,10 @@ struct CurrencyConverterView: View {
                                         dragOffset = maxDragWidth
                                         isConverted = true
                                         
-                                        Helper.ExchangeRateHelper.convert(1000, from: fromCountryCurrency, to: toCountryCurrency)
-                                        
-                                        
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                             withAnimation(.easeInOut) {
                                                 dragOffset = 0
                                                 isConverted = false
-                                                
                                                 dismiss()
                                             }
                                         }
@@ -299,7 +336,6 @@ struct CurrencyConverterView: View {
         .frame(height: 56)
         .padding(.horizontal, 30)
     }
-    
 }
 
 #Preview {

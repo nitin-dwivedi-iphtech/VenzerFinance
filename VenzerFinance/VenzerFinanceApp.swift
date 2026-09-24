@@ -16,6 +16,7 @@ struct VenzerFinanceApp: App {
         WindowGroup {
             SplashScreen()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(AppState.shared)
         }
     }
 }
