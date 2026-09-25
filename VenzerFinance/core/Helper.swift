@@ -36,6 +36,14 @@ enum Helper {
                 return 5.25
             case .usa:
                 return 0.35
+            case .aus:
+                return 0.84
+            case .canada:
+                return 0.24
+            case .nigeria:
+                return 3.85
+            case .euro:
+                return 1.25
             }
         }
         

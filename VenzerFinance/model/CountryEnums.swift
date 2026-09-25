@@ -12,6 +12,10 @@ enum Country: String, CaseIterable, Identifiable {
     case usa = "USA"
     case china = "CHINA"
     case japan = "JAPAN"
+    case euro = "EURO"
+    case aus = "AUSTRALIA"
+    case nigeria = "NIGERIA"
+    case canada = "CANADA"
     
     var id:String { self.rawValue }
     
@@ -25,6 +29,14 @@ enum Country: String, CaseIterable, Identifiable {
             return "Yuan"
         case .japan:
             return "Yen"
+        case .euro:
+            return "EURO"
+        case .aus:
+            return "AUS Dollar"
+        case .nigeria:
+            return "Nigerian Naira"
+        case .canada:
+            return "Candian Dollar"
         }
     }
     
@@ -34,6 +46,10 @@ enum Country: String, CaseIterable, Identifiable {
         case .usa: return "USD"
         case .china: return "CNY"
         case .japan: return "JPY"
+        case .euro: return "EUR"
+        case .aus: return "AUD"
+        case .nigeria: return "NGN"
+        case .canada: return "CAD"
         }
     }
     
@@ -43,15 +59,20 @@ enum Country: String, CaseIterable, Identifiable {
         case .usa: return "usaFlagImage"
         case .china: return "chinaFlagImage"
         case .japan: return "japanFlagImage"
+        case .euro: return "european-union"
+        case .aus: return "australia"
+        case .nigeria: return "nigeria"
+        case .canada: return "canada"
         }
     }
     
     var currencySymbol: String {
         switch self {
         case .india: return "₹"
-        case .usa: return "$"
-        case .china: return "¥"
-        case .japan: return "¥"
+        case .usa, .aus, .canada: return "$"
+        case .china, .japan: return "¥"
+        case .euro: return "€"
+        case .nigeria: return "₦"
         }
     }
 }

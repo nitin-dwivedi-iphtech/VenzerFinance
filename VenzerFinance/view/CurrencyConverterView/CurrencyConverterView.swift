@@ -56,11 +56,11 @@ struct CurrencyConverterView: View {
         }
     }
     
-    // MARK: - Subviews
+    // Subviews
     
     private var flagHeader: some View {
         HStack(spacing: -8) {
-            ForEach(Array(Country.allCases.enumerated()), id: \.element.id) { index, country in
+            ForEach(Array(Country.allCases.prefix(5).enumerated()), id: \.element.id) { index, country in
                 flagImage(flag: country.flagImageName)
                     .zIndex(Double(Country.allCases.count - index))
             }

@@ -24,7 +24,7 @@ struct LoginView: View {
         }
     }
 
-    // MARK: - Header
+    // Header
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
@@ -41,7 +41,7 @@ struct LoginView: View {
                     .foregroundStyle(.black)
                 Spacer()
             }
-            Text("Sign in to continue managing your finances securely")
+            Text(Constants.loginViewSubHeading.rawValue)
                 .font(.system(size: 13.5, weight: .regular))
                 .foregroundStyle(.gray)
                 .lineSpacing(2)
@@ -50,7 +50,7 @@ struct LoginView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    // MARK: - Form Card
+    // Form Card
     private var formCard: some View {
         VStack(spacing: 16) {
             VStack(spacing: 12) {
