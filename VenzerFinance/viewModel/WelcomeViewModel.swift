@@ -17,6 +17,11 @@ class WelcomeViewModel:ObservableObject {
         fetchAccount()
     }
     
+    func refresh() {
+        user = AppState.shared.user
+        fetchAccount()
+    }
+    
     private func fetchAccount() {
         self.account = DbService.shared.fetchAccount(for: user)
         

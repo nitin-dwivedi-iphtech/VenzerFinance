@@ -51,7 +51,13 @@ struct CurrencyConverterView: View {
             Task { await viewModel.fetchRate(from: fromCountryCurrency, to: newTo) }
         }
         .sheet(isPresented: $showAmountSheet) {
-            AmountInputSheet(amountText: $viewModel.amountText, fromCountry: fromCountryCurrency, toCountry: toCountryCurrency, rate: viewModel.rate)
+            AmountInputSheet(
+                    amountText: $viewModel.amountText,
+                    fromCountry: fromCountryCurrency,
+                    toCountry: toCountryCurrency,
+                    rate: viewModel.rate,
+                    maxBalance: viewModel.maxBalance
+                )
                 
         }
     }

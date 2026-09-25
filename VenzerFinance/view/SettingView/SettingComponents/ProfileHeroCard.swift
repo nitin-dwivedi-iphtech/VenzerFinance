@@ -11,6 +11,7 @@ import SwiftUI
 //  hero card
 struct ProfileHeroCard: View {
     @ObservedObject var viewModel: SettingViewModel
+    @State private var showEditSheet: Bool = false
 
     var body: some View {
         VStack(spacing: 14) {
@@ -48,7 +49,7 @@ struct ProfileHeroCard: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(viewModel.user?.name ?? "—").font(.system(size: 16, weight: .bold)).foregroundColor(.black).lineLimit(1)
-                    Text(viewModel.user?.name ?? "—").font(.system(size: 12)).foregroundColor(.black.opacity(0.6)).lineLimit(1)
+                    Text(viewModel.user?.email ?? "—").font(.system(size: 12)).foregroundColor(.black.opacity(0.6)).lineLimit(1)
 
                     if let raw = viewModel.user?.country, let c = Country(rawValue: raw) {
                         HStack(spacing: 6) {
@@ -90,26 +91,42 @@ struct ProfileHeroCard: View {
 
     private var bottomButtons: some View {
         HStack(spacing: 10) {
-            Button {} label: {
+            Button {
+                showEditSheet = true
+            } label: {
                 Label("Edit Profile", systemImage: "person.crop.circle.badge.checkmark")
                     .font(.system(size: 13, weight: .semibold)).frame(maxWidth: .infinity).padding(.vertical, 12)
                     .background(Color.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 14))
             }.tint(.white)
 
-            Button {} label: {
+            ShareLink(item: shareText) {
                 Label("Share", systemImage: "square.and.arrow.up")
-                    .font(.system(size: 13, weight: .semibold)).foregroundColor(.black)
+                    .font(.system(size: 13, weight: .semibold)).foregroundColor(.white)
                     .frame(maxWidth: .infinity).padding(.vertical, 12)
-                    .background(Color.white, in: RoundedRectangle(cornerRadius: 14))
-            }.tint(.black)
+                    .background(Color.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 14))
+            }
         }
+        .sheet(isPresented: $showEditSheet) {
+            NavigationStack {
+                PersonalDetailsView(viewModel: viewModel)
+                    .presentationDetents([.medium, .large])
+            }
+        }
+    }
+
+    private var shareText: String {
+        let name = viewModel.user?.name ?? "Venzer user"
+        var text = "\(name) on Venzer Finance"
+        if let email = viewModel.user?.email, !email.isEmpty {
+            text += " • \(email)"
+        }
+        return text
     }
 
     private func getBalance() -> String {
         guard let bal = viewModel.account?.balance else { return "—" }
-        let v = bal.doubleValue
-        if v == 0 { return "0.00" }
-        return String(format: "%.2f", v)
+        if bal == 0 { return "0.00" }
+        return String(format: "%.2f", bal)
     }
 
     private func getShortNo() -> String {

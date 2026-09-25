@@ -10,8 +10,28 @@ import Combine
 
 class CurrencyConverterViewModel: ObservableObject {
     @Published var rate: Double = 0.0
-    @Published var amountText: String = "1000"
+    
+    let maxBalance: Double
+    
+    @Published var amountText: String = "" {
+        didSet {
+            if let doubleVal = Double(amountText), doubleVal > maxBalance {
+                amountText = String(format: "%.2f", maxBalance)
+            }
+        }
+    }
+    
     @Published var isLoading: Bool = false
+    
+    init() {
+        if let balance = DbService.shared.fetchAccount(for: AppState.shared.user)?.balance {
+            self.maxBalance = balance
+            self.amountText = String(format: "%.2f", balance)
+        } else {
+            self.maxBalance = 0.0
+            self.amountText = "0.00"
+        }
+    }
     
     func getConvertedValue(from: Country, to: Country) -> String {
         guard let amount = Double(amountText) else { return "0.00" }

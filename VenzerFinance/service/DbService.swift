@@ -22,6 +22,14 @@ class DbService: ObservableObject {
         return data?.first
     }
     
+    func getAccountDetails(for account_no:String) -> Account? {
+        let request: NSFetchRequest<Account> = Account.fetchRequest()
+        request.predicate = NSPredicate(format: "account_no == %@", account_no)
+        request.fetchLimit = 1
+        let data = try? context.fetch(request)
+        return data?.first
+    }
+    
     // Accounts
     @discardableResult
     func saveAccountDetails(accountNo: String, bankName: String, balanceText: String, for user: User?, existingAccount: Account?) -> Account {
@@ -36,8 +44,24 @@ class DbService: ObservableObject {
         account.account_no = accountNo.trimmingCharacters(in: .whitespacesAndNewlines)
         account.bankName = bankName.trimmingCharacters(in: .whitespacesAndNewlines)
         if let value = Double(balanceText.trimmingCharacters(in: .whitespacesAndNewlines)) {
-            account.balance = NSDecimalNumber(value: value)
+            account.balance = value
         }
+        context.saveData()
+        return account
+    }
+    
+    @discardableResult
+    func addAccount(accountNo:String, bankName:String, balanceText:String) -> Account? {
+        if (getAccountDetails(for: accountNo) != nil) { return nil }
+        
+        let account = Account(context: context)
+        if let value = Double(balanceText.trimmingCharacters(in: .whitespacesAndNewlines)) {
+            account.balance = value
+        }
+        account.id = UUID().uuidString
+        account.user_id = AppState.shared.user?.id
+        account.account_no = accountNo.trimmingCharacters(in: .whitespacesAndNewlines)
+        account.bankName = bankName.trimmingCharacters(in: .whitespacesAndNewlines)
         context.saveData()
         return account
     }

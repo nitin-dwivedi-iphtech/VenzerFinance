@@ -2,12 +2,18 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="25249" systemVersion="26A428" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="Account" representedClassName="Account" syncable="YES" codeGenerationType="class">
         <attribute name="account_no" optional="YES" attributeType="String"/>
-        <attribute name="balance" optional="YES" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="balance" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="bankName" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="user_id" optional="YES" attributeType="String"/>
         <relationship name="account_transaction_relation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Transaction" inverseName="tran_account_relation" inverseEntity="Transaction"/>
         <relationship name="account_user_relation" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="user_account_relation" inverseEntity="User"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+                <constraint value="account_no"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
     </entity>
     <entity name="Transaction" representedClassName="Transaction" syncable="YES" codeGenerationType="class">
         <attribute name="account_id" optional="YES" attributeType="String"/>

@@ -48,8 +48,7 @@ struct subView: View {
                 case .home:
                     WelcomeView()
                 case .balanceOverview:
-                    Text("Balance Overview View")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    BalanceOverviewView()
                 case .chart:
                     Text("Chart View")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)

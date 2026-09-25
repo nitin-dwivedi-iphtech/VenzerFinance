@@ -9,10 +9,14 @@ import SwiftUI
 
 struct AddAccountView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject var viewModel:SettingViewModel
     
     @State private var accountNo: String = ""
     @State private var bankName: String = ""
     @State private var balanceText: String = ""
+    @State private var showAlert: Bool = false
+    @State private var showSuccess: Bool = false
+    @State private var showDetails: Bool = false
     
     private var previewName: String { bankName.isEmpty ? "Your Bank" : bankName }
     private var previewBalance: String { balanceText.isEmpty ? "$0.00" : "$\(balanceText)" }
@@ -61,7 +65,28 @@ struct AddAccountView: View {
                 }
             }
         }
+        .alert("account exists", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {
+                resetForm()
+            }
+        } message: {
+            Text("Add other account")
+        }
         .background { CustomBackgroundView() }
+        .navigationDestination(isPresented: $showSuccess) {
+            AccountAddedView(
+                bankName: bankName,
+                accountNo: accountNo,
+                balanceText: previewBalance,
+                viewModel: viewModel,
+                onDone: { dismiss() },
+                onViewDetails: { showDetails = true },
+                onBack: { dismiss() }
+            )
+        }
+        .navigationDestination(isPresented: $showDetails) {
+            AccountDetailsView(viewModel: viewModel)
+        }
     }
     
     private var formCard: some View {
@@ -129,8 +154,14 @@ struct AddAccountView: View {
     private var saveButton: some View {
         VStack(spacing: 10) {
             Button {
-                // handel saving in core data
-                dismiss()
+                if Helper.isFormValid(for: [accountNo, balanceText, bankName]) {
+                    if viewModel.addAccount(accountNo: accountNo, bankName: bankName, balanceText: balanceText) {
+                        showAlert = false
+                        showSuccess = true
+                    } else {
+                        showAlert = true
+                    }
+                }
             } label: {
                 HStack(spacing: 8) {
                     Text("Add Account")
@@ -163,8 +194,15 @@ struct AddAccountView: View {
         }
         .padding(.horizontal, 20)
     }
+    
+    private func resetForm() {
+        accountNo = ""
+        balanceText = ""
+        bankName = ""
+        showAlert = false
+    }
 }
 
 #Preview {
-    NavigationStack { AddAccountView() }
+    NavigationStack { AddAccountView(viewModel: SettingViewModel()) }
 }

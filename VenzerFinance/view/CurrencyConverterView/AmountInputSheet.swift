@@ -13,6 +13,7 @@ struct AmountInputSheet: View {
     var fromCountry: Country
     var toCountry: Country
     var rate: Double
+    var maxBalance: Double
     
     @Environment(\.dismiss) private var dismiss
     
@@ -38,7 +39,7 @@ struct AmountInputSheet: View {
                     .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.black.opacity(0.06), lineWidth: 1))
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 20)
+                .padding(.top, 30)
                 
                 Text("1 \(fromCountry.currencyCode) = \(String(format: "%.4f", rate)) \(toCountry.currencyCode)")
                     .font(.system(size: 13))
@@ -47,6 +48,9 @@ struct AmountInputSheet: View {
                 
                 
                 Button {
+                    if let value = Double(amountText), value > maxBalance || value == 0 {
+                        amountText = String(format: "%.2f", maxBalance)
+                    }
                     dismiss()
                 } label: {
                     Text("Done")

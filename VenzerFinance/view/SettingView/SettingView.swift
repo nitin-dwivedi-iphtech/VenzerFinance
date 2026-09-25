@@ -11,7 +11,7 @@ import CoreData
 struct SettingView: View {
     @StateObject private var viewModel = SettingViewModel()
     @EnvironmentObject private var authViewModel: AuthViewModel
-
+    
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -51,6 +51,7 @@ struct SettingView: View {
             .ignoresSafeArea(edges: .bottom)
         }
         .background { CustomBackgroundView() }
+        
         .onAppear {
             viewModel.refresh()
         }

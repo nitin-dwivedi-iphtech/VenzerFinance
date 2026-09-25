@@ -115,6 +115,102 @@ struct NotchedCardShape: Shape {
     }
 }
 
+struct BalanceOverviewCardShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+        
+        //  top outer circle arc
+        path.addArc(
+            center: center,
+            radius: radius,
+            startAngle: .degrees(145),
+            endAngle: .degrees(35),
+            clockwise: false
+        )
+        
+        //  left point to complete the shape
+        let leftPoint = CGPoint(
+            x: center.x + radius * cos(145 * .pi / 180),
+            y: center.y + radius * sin(145 * .pi / 180)
+        )
+        
+        // Flatter bottom curve
+        let bottomScoopControl = CGPoint(
+            x: rect.midX,
+            y: rect.midY + (radius * 0.5)
+        )
+        
+        path.addQuadCurve(to: leftPoint, control: bottomScoopControl)
+        
+        path.closeSubpath()
+        return path
+    }
+}
+
+//  Supporting Components
+
+struct InnerDashedArc: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.addArc(
+            center: CGPoint(x: rect.midX, y: rect.midY),
+            radius: rect.width / 2,
+            startAngle: .degrees(180),
+            endAngle: .degrees(0),
+            clockwise: false
+        )
+        return path
+    }
+}
+
+struct MockChartView: View {
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                Path { path in
+                    let width = geo.size.width
+                    let height = geo.size.height
+                    let midY = height / 2
+                    
+                    path.move(to: CGPoint(x: 0, y: midY))
+                    path.addCurve(to: CGPoint(x: width * 0.3, y: midY + 20),
+                                  control1: CGPoint(x: width * 0.1, y: midY - 20),
+                                  control2: CGPoint(x: width * 0.2, y: midY + 40))
+                    path.addCurve(to: CGPoint(x: width * 0.5, y: midY),
+                                  control1: CGPoint(x: width * 0.4, y: midY - 30),
+                                  control2: CGPoint(x: width * 0.45, y: midY))
+                    path.addCurve(to: CGPoint(x: width * 0.7, y: midY - 30),
+                                  control1: CGPoint(x: width * 0.55, y: midY),
+                                  control2: CGPoint(x: width * 0.6, y: midY - 50))
+                    path.addCurve(to: CGPoint(x: width, y: midY - 10),
+                                  control1: CGPoint(x: width * 0.8, y: midY + 20),
+                                  control2: CGPoint(x: width * 0.9, y: midY - 20))
+                }
+                .stroke(
+                    LinearGradient(colors: [.green.opacity(0.3), .green, .green.opacity(0.2)], startPoint: .leading, endPoint: .trailing),
+                    style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                )
+                
+                Circle()
+                    .strokeBorder(Color.white, lineWidth: 2)
+                    .background(Circle().fill(Color(red: 0.05, green: 0.22, blue: 0.18)))
+                    .frame(width: 12, height: 12)
+                    .position(x: geo.size.width * 0.5, y: geo.size.height / 2)
+                
+                Capsule()
+                    .fill(Color(red: 0.05, green: 0.22, blue: 0.18))
+                    .frame(width: 44, height: 20)
+                    .overlay(Text("-27%").font(.system(size: 10, weight: .bold)).foregroundColor(.white))
+                    .position(x: geo.size.width * 0.5, y: geo.size.height / 2 + 20)
+            }
+        }
+        .frame(width: 220)
+    }
+}
+
 #Preview {
     VStack(spacing: 30) {
         NotchedCardShape(position: .top, direction: .outward)

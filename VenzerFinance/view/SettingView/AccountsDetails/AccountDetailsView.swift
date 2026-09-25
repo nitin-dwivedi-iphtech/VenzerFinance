@@ -11,6 +11,12 @@ struct AccountDetailsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel:SettingViewModel
     
+    @State private var showAddAccount: Bool = false
+    @State private var accountNo: String = ""
+    @State private var bankName: String = ""
+    @State private var balanceText: String = ""
+    @State private var showAlert: Bool = false
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 16) {
@@ -42,13 +48,33 @@ struct AccountDetailsView: View {
             }
         }
         .background { CustomBackgroundView() }
+        .onAppear { seedFields() }
+        .onChange(of: viewModel.account?.id) { _, _ in seedFields() }
+        .alert("Missing details", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Account number, bank name and balance are all required.")
+        }
+        .sheet(isPresented: $showAddAccount) {
+            NavigationStack {
+                AddAccountView(viewModel: viewModel)
+                    .presentationDetents([.medium, .large])
+            }
+        }
+    }
+    
+    private func seedFields() {
+        guard let acc = viewModel.account else { return }
+        accountNo = acc.account_no ?? ""
+        bankName = acc.bankName ?? ""
+        balanceText = String(format: "%.2f", acc.balance)
     }
     
     private var cardPreview: some View {
         AccountCardView(
-            displayName: viewModel.bankName.isEmpty ? "Your Bank" : viewModel.bankName,
-            balanceText: viewModel.balanceText.isEmpty ? "$0.00" : "$\(viewModel.balanceText)",
-            lastFour: viewModel.accountNo.isEmpty ? "••••" : String(viewModel.accountNo.suffix(4))
+            displayName: bankName.isEmpty ? "Your Bank" : bankName,
+            balanceText: balanceText.isEmpty ? "$0.00" : "$\(balanceText)",
+            lastFour: accountNo.isEmpty ? "••••" : String(accountNo.suffix(4))
         )
         .padding(.horizontal, 16)
     }
@@ -68,9 +94,9 @@ struct AccountDetailsView: View {
             }
             
             VStack(spacing: 10) {
-                modernField(title: "Account Number", text: $viewModel.accountNo, icon: "number", placeholder: "0849 1234 5678", keyboard: .numberPad)
-                modernField(title: "Bank Name", text: $viewModel.bankName, icon: "building.columns.fill", placeholder: "e.g. PayPal")
-                modernField(title: "Balance", text: $viewModel.balanceText, icon: "dollarsign.circle.fill", placeholder: "0.00", keyboard: .decimalPad)
+                modernField(title: "Account Number", text: $accountNo, icon: "number", placeholder: "0849 1234 5678", keyboard: .numberPad)
+                modernField(title: "Bank Name", text: $bankName, icon: "building.columns.fill", placeholder: "e.g. PayPal")
+                modernField(title: "Balance", text: $balanceText, icon: "dollarsign.circle.fill", placeholder: "0.00", keyboard: .decimalPad)
             }
             .padding(12)
             .background(Color("InsideCarTopColor").opacity(0.38), in: RoundedRectangle(cornerRadius: 16))
@@ -112,9 +138,14 @@ struct AccountDetailsView: View {
     
     private var saveButton: some View {
         Button {
-            if viewModel.isValid() {
-                viewModel.saveAccountDetails()
+            guard Helper.isFormValid(for: [accountNo, bankName, balanceText]) else {
+                showAlert = true
+                return
             }
+            viewModel.accountNo = accountNo
+            viewModel.bankName = bankName
+            viewModel.balanceText = balanceText
+            viewModel.saveAccountDetails()
             dismiss()
         } label: {
             HStack(spacing: 8) {
@@ -155,8 +186,8 @@ struct AccountDetailsView: View {
             .padding(.horizontal, 16)
             
             VStack(spacing: 8) {
-                NavigationLink {
-                    AddAccountView()
+                Button {
+                    showAddAccount = true
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus.circle.fill").font(.system(size: 14, weight: .semibold))

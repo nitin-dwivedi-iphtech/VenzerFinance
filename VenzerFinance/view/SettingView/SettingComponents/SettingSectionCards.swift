@@ -11,18 +11,28 @@ import SwiftUI
 struct AccountStatusCard: View {
     
     @ObservedObject var viewModel: SettingViewModel
+    @State private var showAddAccount: Bool = false
     
     var body: some View {
-        if viewModel.account == nil {
-            EmptyAccountCard()
-        } else {
-            LinkedAccountCard(account: viewModel.account!)
+        Group {
+            if viewModel.account == nil {
+                EmptyAccountCard(viewModel: viewModel) { showAddAccount = true }
+            } else {
+                LinkedAccountCard(account: viewModel.account!)
+            }
+        }
+        .sheet(isPresented: $showAddAccount) {
+            NavigationStack {
+                AddAccountView(viewModel: viewModel)
+                    .presentationDetents([.medium, .large])
+            }
         }
     }
 }
 
 struct EmptyAccountCard: View {
-    @State var showEditSheet:Bool = false
+    @ObservedObject var viewModel: SettingViewModel
+    var onAdd: () -> Void
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
@@ -43,9 +53,7 @@ struct EmptyAccountCard: View {
                 }
                 Spacer()
             }
-            Button {
-                showEditSheet = true
-            } label: {
+            Button(action: onAdd) {
                 Text("Add account")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(Color("InsideCarBottomColor"))
@@ -56,12 +64,6 @@ struct EmptyAccountCard: View {
         .padding(16)
         .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 6)
-        .sheet(isPresented: $showEditSheet){
-            NavigationStack {
-                AddAccountView()
-                    .presentationDetents([.medium, .large])
-            }
-        }
     }
 }
 
@@ -74,10 +76,8 @@ struct LinkedAccountCard: View {
                 Label("Linked account", systemImage: "checkmark.seal.fill")
                     .font(.system(size: 12, weight: .bold)).foregroundColor(Color("CardColor"))
                     .padding(.horizontal, 10).padding(.vertical, 6)
-                    .background(Color("InsideCarBottomColor").opacity(0.28), in: Capsule())
                 Spacer()
-                Text("Active").font(.system(size: 10, weight: .bold)).foregroundColor(.white)
-                    .padding(.horizontal, 8).padding(.vertical, 4).background(Color.green.opacity(0.85), in: Capsule())
+                
             }
             VStack(spacing: 10) {
                 HStack {
@@ -110,10 +110,9 @@ struct LinkedAccountCard: View {
     }
     
     func getBalance() -> String {
-        guard let bal = account.balance else { return "—" }
-        let v = bal.doubleValue
-        if v == 0 { return "0.00" }
-        return String(format: "%.2f", v)
+        let bal = account.balance
+        if bal == 0 { return "0.00" }
+        return String(format: "%.2f", bal)
     }
 }
 
@@ -156,7 +155,7 @@ struct AccountDetailsCard: View {
             showEditSheet = true
         }) {
             VStack(spacing: 0) {
-                SimpleRow(icon: "building.columns.fill", title: "Bank Name", value: account == nil ? "—" : "Personal")
+                SimpleRow(icon: "building.columns.fill", title: "Bank Name", value: account?.bankName)
                 SimpleDivider()
                 SimpleRow(icon: "envelope.open", title: "Billing email", value: user?.email)
                 SimpleDivider()
@@ -165,7 +164,7 @@ struct AccountDetailsCard: View {
                         .overlay(Image(systemName: "wallet.bifold").foregroundColor(Color("CardColor")))
                     Text("Bank Account").font(.system(size: 13))
                     Spacer()
-                    Text("8470890...").font(.system(size: 13)).foregroundColor(.gray)
+                    Text(viewModel.account?.account_no ?? "-").font(.system(size: 13)).foregroundColor(.gray)
                 }
                 .padding(.horizontal, 10).padding(.vertical, 10)
             }
