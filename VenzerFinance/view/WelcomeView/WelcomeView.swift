@@ -10,37 +10,45 @@ import SwiftUI
 struct WelcomeView: View {
     @StateObject var welcomeViewModel: WelcomeViewModel = WelcomeViewModel()
     @State var showCurrencyConverterView: Bool = false
-
-
+    
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 16) {
-                header
-                welcomeSection
-
-                if welcomeViewModel.account != nil {
-                    accountCard
-
-                    HStack(spacing: 12) {
-                        ExpenseCard()
-                        RecentTransactionCard()
-                    }
-                    .padding(.horizontal, 20)
-
-                    SpendingTrendCard()
-
-                    TransactionsCard()
-                } else {
-                    Spacer()
-                    VStack {
-                        Text("Account not found!!")
-                            .font(.system(size: 15))
-                        Text("Please add new account in settings")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.gray)
+        Group {
+            if welcomeViewModel.account != nil {
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 16) {
+                        header
+                        welcomeSection
+                        accountCard
+                        
+                        HStack(spacing: 12) {
+                            ExpenseCard()
+                            RecentTransactionCard()
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        SpendingTrendCard()
+                        TransactionsCard()
                     }
                 }
-                Spacer()
+            } else {
+                VStack(spacing: 0) {
+                    header
+                    welcomeSection
+                    
+                    Spacer()
+                    
+                    VStack(spacing: 6) {
+                        Text("Account not found!!")
+                            .font(.system(size: 15, weight: .semibold))
+                        Text("Please add new account in settings")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.gray)
+                    }
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    
+                    Spacer()
+                }
             }
         }
         .onAppear { welcomeViewModel.refresh() }
@@ -61,16 +69,15 @@ struct WelcomeView: View {
             }
         }
     }
-
-
+    
     var header: some View {
         HStack {
             Text("venzer.")
                 .font(.title)
                 .bold()
-
+            
             Spacer()
-
+            
             Button(action: {
                 showCurrencyConverterView = true
             }) {
@@ -80,7 +87,7 @@ struct WelcomeView: View {
             }
             .padding(10)
             .background(.white.opacity(0.67), in: Circle())
-
+            
             Image("image")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
@@ -93,7 +100,7 @@ struct WelcomeView: View {
         .padding(.vertical, 10)
         .padding(.horizontal, 20)
     }
-
+    
     var welcomeSection: some View {
         VStack(alignment: .leading, spacing: 3) {
             Text("Hi \(welcomeViewModel.user?.name ?? "User"),")
@@ -108,7 +115,7 @@ struct WelcomeView: View {
         .padding(.horizontal, 20)
         .padding(.bottom, 20)
     }
-
+    
     var accountCard: some View {
         AccountCardView(
             displayName: welcomeViewModel.user?.name ?? "User",
@@ -117,13 +124,12 @@ struct WelcomeView: View {
         )
         .padding(.horizontal, 20)
     }
-
-
+    
     private var balanceText: String {
         guard let account = welcomeViewModel.account else { return "$0.00" }
         return String(format: "$%.2f", account.balance)
     }
-
+    
     private var lastFour: String {
         guard let no = welcomeViewModel.account?.account_no, !no.isEmpty else { return "••••" }
         return String(no.suffix(4))
