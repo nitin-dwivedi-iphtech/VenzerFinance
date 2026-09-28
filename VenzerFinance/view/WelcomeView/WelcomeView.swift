@@ -21,13 +21,16 @@ struct WelcomeView: View {
                         accountCard
                         
                         HStack(spacing: 12) {
-                            ExpenseCard()
+                            ExpenseCard(displayAmount: welcomeViewModel.monthExpenseDisplay)
                             RecentTransactionCard()
                         }
                         .padding(.horizontal, 20)
                         
-                        SpendingTrendCard()
-                        TransactionsCard()
+                        SpendingTrendCard(
+                            monthColumns: welcomeViewModel.heatmapMonthColumns,
+                            counts: welcomeViewModel.heatmapCounts
+                        )
+                        TransactionsCard(transactions: welcomeViewModel.transactionItems)
                     }
                 }
             } else {
@@ -126,8 +129,10 @@ struct WelcomeView: View {
     }
     
     private var balanceText: String {
-        guard let account = welcomeViewModel.account else { return "$0.00" }
-        return String(format: "$%.2f", account.balance)
+        guard let account = welcomeViewModel.account else {
+            return "\(welcomeViewModel.currencySymbol)0.00"
+        }
+        return String(format: "%@%.2f", welcomeViewModel.currencySymbol, account.balance)
     }
     
     private var lastFour: String {

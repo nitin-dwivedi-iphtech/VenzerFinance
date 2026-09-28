@@ -75,4 +75,13 @@ enum Country: String, CaseIterable, Identifiable {
         case .nigeria: return "₦"
         }
     }
+    
+    static func fromCurrencyCode(_ code: String?) -> Country? {
+        guard let code else { return nil }
+        return allCases.first { $0.currencyCode == code }
+    }
+
+    static func symbol(forCurrencyCode code: String?) -> String {
+        fromCurrencyCode(code)?.currencySymbol ?? "$"
+    }
 }

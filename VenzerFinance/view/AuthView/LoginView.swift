@@ -38,7 +38,7 @@ struct LoginView: View {
                     )
                 Text("Welcome Back!")
                     .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color("CardText"))
                 Spacer()
             }
             Text(Constants.loginViewSubHeading.rawValue)
@@ -148,12 +148,12 @@ struct LoginView: View {
         .padding(.vertical, 20)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Color.white)
+                .fill(Color("CardBackground"))
                 .shadow(color: Color.black.opacity(0.07), radius: 18, x: 0, y: 10)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Color.white.opacity(0.9), lineWidth: 1)
+                .stroke(Color("CardText").opacity(0.1), lineWidth: 1)
         )
     }
 
@@ -162,12 +162,6 @@ struct LoginView: View {
             Rectangle()
                 .fill(Color.black.opacity(0.06))
                 .frame(height: 1)
-            Text("OR")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(.gray.opacity(0.6))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 4)
-                .background(Color("InsideCarTopColor"), in: Capsule())
             Rectangle()
                 .fill(Color.black.opacity(0.06))
                 .frame(height: 1)
@@ -183,10 +177,10 @@ struct LoginView: View {
                 Text(title)
                     .font(.system(size: 13.5, weight: .semibold))
             }
-            .foregroundStyle(.black.opacity(0.85))
+            .foregroundStyle(Color("CardText").opacity(0.85))
             .frame(maxWidth: .infinity)
             .frame(height: 46)
-            .background(Color.white)
+            .background(Color("CardBackground"))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)

@@ -167,6 +167,8 @@ struct InnerDashedArc: Shape {
 }
 
 struct MockChartView: View {
+    var pillText: String
+
     var body: some View {
         GeometryReader { geo in
             ZStack {
@@ -202,8 +204,8 @@ struct MockChartView: View {
                 
                 Capsule()
                     .fill(Color(red: 0.05, green: 0.22, blue: 0.18))
-                    .frame(width: 44, height: 20)
-                    .overlay(Text("-27%").font(.system(size: 10, weight: .bold)).foregroundColor(.white))
+                    .frame(width: 52, height: 20)
+                    .overlay(Text(pillText).font(.system(size: 10, weight: .bold)).foregroundColor(.white))
                     .position(x: geo.size.width * 0.5, y: geo.size.height / 2 + 20)
             }
         }

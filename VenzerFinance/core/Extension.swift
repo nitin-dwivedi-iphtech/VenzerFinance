@@ -27,3 +27,6 @@ extension NSManagedObjectContext {
     }
 }
 
+extension Notification.Name {
+    static let balanceDidChange = Notification.Name("balanceDidChange")
+}

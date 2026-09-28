@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct ExpenseCard: View {
+    var displayAmount: String = "$0.00"
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -29,11 +31,7 @@ struct ExpenseCard: View {
 
             HStack(alignment: .center, spacing: 4) {
                 HStack(spacing: 1) {
-                    Image(systemName: "dollarsign")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(.gray)
-
-                    Text("0")
+                    Text(displayAmount)
                         .font(.system(size: 18, weight: .bold))
                 }
             }
@@ -45,7 +43,7 @@ struct ExpenseCard: View {
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: 150)
-        .background(.white, in: RoundedRectangle(cornerRadius: 15))
+        .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 15))
         .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
     }
 }

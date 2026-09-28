@@ -51,7 +51,7 @@ struct AuthView: View {
         HStack(alignment: .center) {
             Text("venzer.")
                 .font(.system(size: 26, weight: .bold))
-                .foregroundStyle(.black)
+                .foregroundStyle(Color("CardText"))
                 .tracking(-0.5)
             
             Spacer()
@@ -67,7 +67,7 @@ struct AuthView: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(Color.white.opacity(0.85), in: Capsule())
+            .background(Color("CardBackground").opacity(0.85), in: Capsule())
             .overlay(Capsule().stroke(Color.black.opacity(0.06), lineWidth: 1))
             .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
         }
@@ -189,7 +189,7 @@ struct AuthView: View {
         .padding(4)
         .background(
             Capsule()
-                .fill(Color.white)
+                .fill(Color("CardBackground"))
                 .shadow(color: Color.black.opacity(0.06), radius: 10, x: 0, y: 4)
                 .overlay(Capsule().stroke(Color.black.opacity(0.05), lineWidth: 1))
         )

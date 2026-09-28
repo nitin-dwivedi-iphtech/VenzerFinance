@@ -144,7 +144,7 @@ struct AccountAddedView: View {
 
             Text("Account Added!")
                 .font(.system(size: 26, weight: .bold))
-                .foregroundColor(.black)
+                .foregroundColor(Color("CardText"))
 
             Text("Your \(bankName.isEmpty ? "bank" : bankName) account ending in \(lastFour) is now connected and ready to use.")
                 .font(.system(size: 13))
@@ -170,7 +170,7 @@ struct AccountAddedView: View {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Linked account")
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.black)
+                        .foregroundColor(Color("CardText"))
                     Text("Active • Ready for payments")
                         .font(.system(size: 11))
                         .foregroundColor(.gray)
@@ -192,10 +192,10 @@ struct AccountAddedView: View {
                 detailRow(icon: "dollarsign.circle.fill", title: "Balance", value: balanceText.isEmpty ? "$0.00" : balanceText)
             }
             .padding(6)
-            .background(Color("InsideCarTopColor").opacity(0.55), in: RoundedRectangle(cornerRadius: 16))
+            .settingInset(0.55)
         }
         .padding(16)
-        .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
+        .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 20))
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black.opacity(0.06), lineWidth: 1))
         .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 6)
         .padding(.horizontal, 16)
@@ -217,13 +217,13 @@ struct AccountAddedView: View {
 
             Text(title)
                 .font(.system(size: 13))
-                .foregroundColor(.black.opacity(0.8))
+                .foregroundColor(.primary)
 
             Spacer()
 
             Text(value)
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.black.opacity(0.85))
+                .foregroundColor(Color("CardText"))
                 .lineLimit(1)
         }
         .padding(.horizontal, 10)

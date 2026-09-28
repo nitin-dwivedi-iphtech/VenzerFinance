@@ -4,6 +4,7 @@
         <attribute name="account_no" optional="YES" attributeType="String"/>
         <attribute name="balance" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="bankName" optional="YES" attributeType="String"/>
+        <attribute name="currency" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="user_id" optional="YES" attributeType="String"/>
         <relationship name="account_transaction_relation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Transaction" inverseName="tran_account_relation" inverseEntity="Transaction"/>

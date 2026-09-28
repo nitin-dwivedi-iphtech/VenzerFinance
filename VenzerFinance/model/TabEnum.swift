@@ -10,7 +10,7 @@ enum Tab: String, CaseIterable, Identifiable {
     case home = "house.fill"
     case balanceOverview = "wallet.pass.fill"
     case chart = "chart.bar.fill"
-    case setting = "gearshape.2.fill"
+    case setting = "gearshape.fill"
     
     var id:String { self.rawValue }
     

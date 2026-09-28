@@ -9,11 +9,13 @@
 import SwiftUI
 
 struct AccountCardView: View {
+    @State var showTransactionSheet:Bool = false
+    
     var displayName: String
     var balanceText: String
     var lastFour: String
     var bankLabel: String = "PayPal"
-
+    
     var body: some View {
         VStack(spacing: 16) {
             ZStack(alignment: .bottom) {
@@ -37,7 +39,7 @@ struct AccountCardView: View {
                         .padding(.top, 12)
                     }
                     .padding(.bottom, 15)
-
+                
                 HStack {
                     Text("•••• \(lastFour)")
                         .font(.system(size: 15))
@@ -57,7 +59,7 @@ struct AccountCardView: View {
                 .offset(y: 20)
             }
             .padding(.bottom, 20)
-
+            
             VStack(spacing: 4) {
                 Image(systemName: "dollarsign.circle.fill")
                     .font(.system(size: 20))
@@ -76,7 +78,7 @@ struct AccountCardView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(Color.white.opacity(0.3), style: StrokeStyle(lineWidth: 0.5, lineCap: .round, dash: [6, 6]))
             )
-
+            
             HStack(spacing: 12) {
                 Button(action: {}) {
                     Label("Deposit", systemImage: "square.and.arrow.down")
@@ -84,7 +86,9 @@ struct AccountCardView: View {
                         .padding(.vertical, 10)
                         .background(Color.white.opacity(0.12)).cornerRadius(20)
                 }
-                Button(action: {}) {
+                Button(action: {
+                    showTransactionSheet = true
+                }) {
                     Label("Send", systemImage: "paperplane.fill")
                         .font(.subheadline)
                         .frame(maxWidth: .infinity)
@@ -97,6 +101,11 @@ struct AccountCardView: View {
         .background(Color("CardColor"))
         .clipShape(NotchedCardShape(position: .top, direction: .inward))
         .foregroundStyle(.white)
+        .sheet(isPresented: $showTransactionSheet) {
+            NavigationStack {
+                TransactionAccountView()
+            }
+        }
     }
 }
 
