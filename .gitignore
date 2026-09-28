@@ -1,0 +1,9 @@
+# macOS System Files
+.DS_Store
+
+# Xcode User Data & Local Settings (Includes Breakpoints)
+*.xcuserdata/
+*.xcbkptlist
+*.perspectivev3
+*.mode1v3
+*.mode2v3

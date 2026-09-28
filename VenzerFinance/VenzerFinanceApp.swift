@@ -6,12 +6,17 @@
 //
 
 import SwiftUI
+import CoreData
 
 @main
 struct VenzerFinanceApp: App {
+    let persistenceController = PersistenceController.shared
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SplashScreen()
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(AppState.shared)
         }
     }
 }
