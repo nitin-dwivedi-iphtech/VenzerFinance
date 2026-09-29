@@ -111,7 +111,8 @@ class WelcomeViewModel:ObservableObject {
         let calendar = Calendar.current
         let now = Date()
         let total = DbService.shared.fetchTransactions(for: user, limit: 1000).reduce(0.0) { sum, tx in
-            guard let date = tx.timestamp,
+            guard (tx.value(forKey: "type") as? String) != "credit",
+                  let date = tx.timestamp,
                   calendar.isDate(date, equalTo: now, toGranularity: .month),
                   let value = Double(tx.amount ?? "") else { return sum }
             return sum + value
@@ -132,13 +133,14 @@ class WelcomeViewModel:ObservableObject {
     private static func mapToItem(_ tx: Transaction, currencySymbol: String) -> TransactionItem {
         let value = Double(tx.amount ?? "") ?? 0
         let dateText = tx.timestamp.map { dateFormatter.string(from: $0) } ?? ""
+        let isCredit = (tx.value(forKey: "type") as? String) == "credit"
         return TransactionItem(
             id: tx.id ?? UUID().uuidString,
-            title: "Money Sent",
+            title: isCredit ? "Money Received" : "Money Sent",
             detail: dateText.isEmpty ? "Transfer" : "Transfer • \(dateText)",
-            icon: "paperplane.fill",
-            amount: String(format: "-%@%.2f", currencySymbol, value),
-            isCredit: false
+            icon: isCredit ? "arrow.down.left.circle.fill" : "paperplane.fill",
+            amount: String(format: "%@%@%.2f", isCredit ? "+" : "-", currencySymbol, value),
+            isCredit: isCredit
         )
     }
 }

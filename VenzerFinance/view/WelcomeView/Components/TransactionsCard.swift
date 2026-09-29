@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TransactionsCard: View {
     let transactions: [TransactionItem]
+    var onSeeAll: () -> Void = {}
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -21,7 +22,7 @@ struct TransactionsCard: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 16)
             } else {
-                ForEach(Array(transactions.enumerated()), id: \.element.id) { index, transaction in
+                ForEach(Array(transactions.prefix(7).enumerated()), id: \.element.id) { index, transaction in
                     TransactionRow(transaction: transaction)
                         .padding(.vertical, 10)
 
@@ -48,10 +49,10 @@ struct TransactionsCard: View {
 
             Spacer()
 
-            Button(action: {}) {
+            Button(action: onSeeAll) {
                 Text("See All")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(Color("CardColor").opacity(0.7))
+                    .foregroundStyle(Color("CardText").opacity(0.6))
             }
         }
         .padding(.bottom, 6)

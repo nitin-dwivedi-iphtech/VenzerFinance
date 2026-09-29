@@ -101,7 +101,7 @@ struct MetricDetailCardView: View {
 
     private var activityPanel: some View {
         HStack(spacing: 0) {
-            statBlock(value: "\(viewModel.monthTransferCount)", caption: "transfers")
+            statBlock(value: "\(viewModel.monthTransferCount)", caption: "sent")
             verticalDivider
             statBlock(value: viewModel.largestTransferDisplay, caption: "largest")
             verticalDivider

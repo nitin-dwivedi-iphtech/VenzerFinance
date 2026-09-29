@@ -33,6 +33,13 @@ class AuthViewModel:ObservableObject {
     @discardableResult
     func createUser(email:String, password:String, name:String, country:String) -> Bool{
         if let context {
+            // Prevent duplicate accounts for the same email
+            let check = User.fetchRequest()
+            check.predicate = NSPredicate(format: "email==%@", argumentArray: [email])
+            check.fetchLimit = 1
+            if let existing = try? context.fetch(check), !existing.isEmpty {
+                return false
+            }
             let user = User(context: context)
             user.id = UUID().uuidString
             user.email = email

@@ -13,6 +13,7 @@ struct SignUpView: View {
     @State private var password: String = ""
     @State private var name: String = ""
     @State private var country: Country = .india
+    @State private var errorMessage: String?
     @Binding var signUp: Bool
     @Binding var isLoading: Bool
 
@@ -25,6 +26,14 @@ struct SignUpView: View {
         VStack(spacing: 18) {
             header
             formCard
+        }
+        .alert("Sign Up Failed", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { errorMessage = nil }
+        } message: {
+            Text(errorMessage ?? "Something went wrong.")
         }
     }
 
@@ -84,11 +93,17 @@ struct SignUpView: View {
 
             Button {
                 focusedField = nil
-                guard Helper.isFormValid(for: [email, password, name, country.rawValue]) else { return }
+                guard Helper.isFormValid(for: [email, password, name, country.rawValue]) else {
+                    errorMessage = "Please fill in your name, email and password."
+                    return
+                }
                 withAnimation { isLoading = true }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    _ = authViewModel.createUser(email: email.trimmingCharacters(in: .whitespaces), password: password, name: name.trimmingCharacters(in: .whitespaces), country: country.rawValue)
+                    let ok = authViewModel.createUser(email: email.trimmingCharacters(in: .whitespaces), password: password, name: name.trimmingCharacters(in: .whitespaces), country: country.rawValue)
                     isLoading = false
+                    if !ok {
+                        errorMessage = "Account could not be created. This email may already exist."
+                    }
                 }
             } label: {
                 HStack(spacing: 8) {

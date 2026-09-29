@@ -94,7 +94,8 @@ class BalanceOverviewViewModel: ObservableObject {
         let calendar = Calendar.current
         let now = Date()
         let monthValues = records.compactMap { tx -> Double? in
-            guard let date = tx.timestamp,
+            guard (tx.value(forKey: "type") as? String) != "credit",
+                  let date = tx.timestamp,
                   calendar.isDate(date, equalTo: now, toGranularity: .month),
                   let value = Double(tx.amount ?? "") else { return nil }
             return value

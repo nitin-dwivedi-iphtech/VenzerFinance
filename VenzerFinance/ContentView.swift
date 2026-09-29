@@ -52,8 +52,7 @@ struct subView: View {
                     BalanceOverviewView()
                     
                 case .chart:
-                    Text("Chart View")
-                        .padding(.bottom, 84)
+                    ChartView()
                 case .setting:
                     SettingView()
                     

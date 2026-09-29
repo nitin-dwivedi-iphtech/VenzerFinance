@@ -10,49 +10,65 @@ import SwiftUI
 struct WelcomeView: View {
     @StateObject var welcomeViewModel: WelcomeViewModel = WelcomeViewModel()
     @State var showCurrencyConverterView: Bool = false
+    @State private var showAllTransactions = false
     
     var body: some View {
-        Group {
-            if welcomeViewModel.account != nil {
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 16) {
+        NavigationStack {
+            ZStack {
+                CustomBackgroundView()
+
+                Group {
+                if welcomeViewModel.account != nil {
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 16) {
+                            header
+                            welcomeSection
+                            accountCard
+                            
+                            HStack(spacing: 12) {
+                                ExpenseCard(displayAmount: welcomeViewModel.monthExpenseDisplay)
+                                RecentTransactionCard()
+                            }
+                            .padding(.horizontal, 20)
+                            
+                            SpendingTrendCard(
+                                monthColumns: welcomeViewModel.heatmapMonthColumns,
+                                counts: welcomeViewModel.heatmapCounts
+                            )
+                            TransactionsCard(
+                                transactions: welcomeViewModel.transactionItems,
+                                onSeeAll: { showAllTransactions = true }
+                            )
+                        }.padding(.bottom,80)
+                    }
+                } else {
+                    VStack(spacing: 0) {
                         header
                         welcomeSection
-                        accountCard
                         
-                        HStack(spacing: 12) {
-                            ExpenseCard(displayAmount: welcomeViewModel.monthExpenseDisplay)
-                            RecentTransactionCard()
+                        Spacer()
+                        
+                        VStack(spacing: 6) {
+                            Text("Account not found!!")
+                                .font(.system(size: 15, weight: .semibold))
+                            Text("Please add new account in settings")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.gray)
                         }
-                        .padding(.horizontal, 20)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
                         
-                        SpendingTrendCard(
-                            monthColumns: welcomeViewModel.heatmapMonthColumns,
-                            counts: welcomeViewModel.heatmapCounts
-                        )
-                        TransactionsCard(transactions: welcomeViewModel.transactionItems)
-                    }.padding(.bottom,80)
-                }
-            } else {
-                VStack(spacing: 0) {
-                    header
-                    welcomeSection
-                    
-                    Spacer()
-                    
-                    VStack(spacing: 6) {
-                        Text("Account not found!!")
-                            .font(.system(size: 15, weight: .semibold))
-                        Text("Please add new account in settings")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.gray)
+                        Spacer()
                     }
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
-                    
-                    Spacer()
                 }
             }
+            .fullScreenCover(isPresented: $showAllTransactions) {
+                NavigationStack {
+                    AllTransactionsView()
+                }
+            }
+            }
+            .toolbarBackground(.hidden, for: .navigationBar)
         }
         .onAppear { welcomeViewModel.refresh() }
         .fullScreenCover(isPresented: $showCurrencyConverterView) {

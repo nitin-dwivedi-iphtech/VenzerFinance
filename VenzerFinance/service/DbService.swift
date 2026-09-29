@@ -129,14 +129,15 @@ class DbService: ObservableObject {
     }
 
     @discardableResult
-    func recordTransaction(amount: Double, from account: Account?, for user: User?) -> Transaction? {
+    func recordTransaction(amount: Double, from account: Account?, for user: User?, forUserId: String? = nil, type: String = "debit") -> Transaction? {
         guard let account else { return nil }
         let tx = Transaction(context: context)
         tx.id = UUID().uuidString
         tx.amount = String(format: "%.2f", amount)
         tx.account_id = account.id
-        tx.user_id = user?.id ?? account.user_id
+        tx.user_id = forUserId ?? user?.id ?? account.user_id
         tx.timestamp = Date()
+        tx.setValue(type, forKey: "type")
         context.saveData()
         return tx
     }
@@ -161,9 +162,16 @@ class DbService: ObservableObject {
             request.fetchLimit = 1
             if let recipientAccount = (try? context.fetch(request))?.first {
                 recipientAccount.balance += amount
+                recordTransaction(
+                    amount: amount,
+                    from: recipientAccount,
+                    for: nil,
+                    forUserId: recipientAccount.user_id ?? recipientId,
+                    type: "credit"
+                )
             }
         }
-        recordTransaction(amount: amount, from: account, for: user)
+        recordTransaction(amount: amount, from: account, for: user, type: "debit")
         context.saveData()
         NotificationCenter.default.post(name: .balanceDidChange, object: nil)
         return true

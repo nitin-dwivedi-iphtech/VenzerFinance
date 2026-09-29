@@ -9,6 +9,7 @@ import SwiftUI
 struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
+    @State private var errorMessage: String?
     @Binding var signUp: Bool
     @Binding var isLoading: Bool
 
@@ -21,6 +22,14 @@ struct LoginView: View {
         VStack(spacing: 18) {
             header
             formCard
+        }
+        .alert("Sign In Failed", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { errorMessage = nil }
+        } message: {
+            Text(errorMessage ?? "Something went wrong.")
         }
     }
 
@@ -84,15 +93,19 @@ struct LoginView: View {
                 }
             }
 
-            // Primary CTA
             Button {
                 focusedField = nil
-                guard Helper.isFormValid(for: [email, password]) else { return }
+                guard Helper.isFormValid(for: [email, password]) else {
+                    errorMessage = "Please enter your email and password."
+                    return
+                }
                 withAnimation { isLoading = true }
-                // small delay to show loading shimmer that matches app theme
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    _ = authViewModel.loginUser(email: email.trimmingCharacters(in: .whitespaces), password: password)
+                    let ok = authViewModel.loginUser(email: email.trimmingCharacters(in: .whitespaces), password: password)
                     isLoading = false
+                    if !ok {
+                        errorMessage = "Invalid email or password. Please try again."
+                    }
                 }
             } label: {
                 HStack(spacing: 8) {

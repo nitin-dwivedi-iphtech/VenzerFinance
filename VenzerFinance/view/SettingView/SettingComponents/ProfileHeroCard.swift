@@ -55,6 +55,7 @@ struct ProfileHeroCard: View {
                         HStack(spacing: 6) {
                             Image(c.flagImageName).resizable().frame(width: 18, height: 18).clipShape(Circle())
                             Text("\(c.rawValue.capitalized) • \(c.currencyCode)").font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(.black)
                         }
                         .padding(.horizontal, 9).padding(.vertical, 5)
                         .background(Color.white, in: Capsule())

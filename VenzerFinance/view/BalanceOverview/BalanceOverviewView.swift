@@ -29,8 +29,8 @@ struct BalanceOverviewView: View {
                         BalanceEmptyStateView()
                     }
 
-                    Spacer(minLength: 24)
-                }
+                    Spacer()
+                }.padding(.bottom,80)
             }
             .refreshable { viewModel.refresh() }
         }
