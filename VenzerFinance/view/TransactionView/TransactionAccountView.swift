@@ -43,7 +43,7 @@ struct TransactionAccountView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 10)
-                .padding(.bottom, 30)
+                .padding(.bottom, 80)
             }
             .sheet(isPresented: $showRecipientSheet) {
                 RecipientSheetView(viewModel: viewModel, isPresented: $showRecipientSheet)

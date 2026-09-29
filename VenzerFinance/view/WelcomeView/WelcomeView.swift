@@ -31,7 +31,7 @@ struct WelcomeView: View {
                             counts: welcomeViewModel.heatmapCounts
                         )
                         TransactionsCard(transactions: welcomeViewModel.transactionItems)
-                    }
+                    }.padding(.bottom,80)
                 }
             } else {
                 VStack(spacing: 0) {

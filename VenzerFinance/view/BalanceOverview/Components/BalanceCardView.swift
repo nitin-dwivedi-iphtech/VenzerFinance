@@ -36,9 +36,10 @@ struct BalanceCardView: View {
                     )
                     .offset(y: -130)
 
-                MockChartView(pillText: viewModel.currencyCode)
+                MockChartView(balance: viewModel.balanceValue, pillText: String(format: "%.2f", viewModel.balanceValue))
                     .frame(width: 220, height: 80)
                     .offset(y: -50)
+                    .id(viewModel.balanceValue)
 
                 VStack(spacing: 4) {
                     Text(viewModel.balanceDisplay)
