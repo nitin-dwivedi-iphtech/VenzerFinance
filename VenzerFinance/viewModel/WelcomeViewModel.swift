@@ -12,6 +12,7 @@ import Foundation
 class WelcomeViewModel:ObservableObject {
     @Published var user = AppState.shared.user
     @Published var account:Account?
+    @Published var avatarData: Data?
     @Published var transactionItems: [TransactionItem] = []
     @Published var heatmapCounts: [[Int]] = Array(repeating: Array(repeating: 0, count: 20), count: 7)
     @Published var heatmapMonthColumns: [(month: String, weeks: Int)] = []
@@ -28,6 +29,7 @@ class WelcomeViewModel:ObservableObject {
     
     func refresh() {
         user = AppState.shared.user
+        avatarData = user?.image
         fetchAccount()
         fetchTransactions()
     }
@@ -41,7 +43,7 @@ class WelcomeViewModel:ObservableObject {
     private static let heatmapBlockWeeks = 4
 
     private func fetchTransactions() {
-        let records = DbService.shared.fetchTransactions(for: user, limit: 1000)
+        let records = DbService.shared.fetchTransactions(for: user, account: account, limit: 1000)
         transactionItems = records.prefix(50).map { Self.mapToItem($0, currencySymbol: currencySymbol) }
         buildHeatmap(from: records)
     }
@@ -59,7 +61,7 @@ class WelcomeViewModel:ObservableObject {
         for tx in records {
             guard let date = tx.timestamp else { continue }
             let day = calendar.startOfDay(for: date)
-            if day > today { continue } // ignore future-dated records
+            if day > today { continue }
             dayCounts[day, default: 0] += 1
         }
 
@@ -110,7 +112,7 @@ class WelcomeViewModel:ObservableObject {
     var monthExpenseTotal: String {
         let calendar = Calendar.current
         let now = Date()
-        let total = DbService.shared.fetchTransactions(for: user, limit: 1000).reduce(0.0) { sum, tx in
+        let total = DbService.shared.fetchTransactions(for: user, account: account, limit: 1000).reduce(0.0) { sum, tx in
             guard (tx.value(forKey: "type") as? String) != "credit",
                   let date = tx.timestamp,
                   calendar.isDate(date, equalTo: now, toGranularity: .month),

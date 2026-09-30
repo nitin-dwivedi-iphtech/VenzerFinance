@@ -52,7 +52,8 @@ final class AllTransactionsViewModel: ObservableObject {
     func refresh() {
         let user = AppState.shared.user
         currencySymbol = Self.resolveSymbol(for: user)
-        let records = DbService.shared.fetchTransactions(for: user, limit: 1000)
+        let account = DbService.shared.fetchAccount(for: user)
+        let records = DbService.shared.fetchTransactions(for: user, account: account, limit: 1000)
         rows = records.map { tx in
             let value = Double(tx.amount ?? "") ?? 0
             let date = tx.timestamp ?? Date()

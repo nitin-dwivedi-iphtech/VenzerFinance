@@ -58,6 +58,9 @@ struct AllTransactionsView: View {
                         .foregroundColor(.primary)
                 }
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                AccountHeaderButton()
+            }
         }
         .searchable(text: $viewModel.searchText, prompt: "Search amount or date")
         .onAppear { viewModel.refresh() }

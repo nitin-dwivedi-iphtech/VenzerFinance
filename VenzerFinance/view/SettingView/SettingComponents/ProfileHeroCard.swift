@@ -4,7 +4,6 @@
 //
 //  Created by iPHTech 40 on 24/09/26.
 //
-//
 
 import SwiftUI
 
@@ -43,8 +42,7 @@ struct ProfileHeroCard: View {
             .padding().background(Color("InsideCarTopColor"))
 
             HStack(spacing: 12) {
-                Image("image")
-                    .resizable().scaledToFill().frame(width: 56, height: 56).clipShape(Circle())
+                UserAvatarView(imageData: viewModel.avatarData, size: 56)
                     .overlay(Circle().stroke(Color.white, lineWidth: 3))
 
                 VStack(alignment: .leading, spacing: 4) {

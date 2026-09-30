@@ -206,3 +206,7 @@ struct MetricDetailCardView: View {
             .frame(width: 1, height: 34)
     }
 }
+
+#Preview {
+    MetricDetailCardView(viewModel: BalanceOverviewViewModel())
+}
