@@ -46,7 +46,7 @@ struct subView: View {
             Group {
                 switch currentTab {
                 case .home:
-                    WelcomeView()
+                    WelcomeView(currentTab: $currentTab)
                     
                 case .balanceOverview:
                     BalanceOverviewView()

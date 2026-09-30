@@ -2,6 +2,8 @@
 //  ChartViewModel.swift
 //  VenzerFinance
 //
+//  Created by iPHTech 40 on 29/09/26.
+//
 
 import Combine
 import Foundation
@@ -60,7 +62,8 @@ final class ChartViewModel: ObservableObject {
     func refresh() {
         let user = AppState.shared.user
         currencySymbol = Self.resolveSymbol(for: user)
-        let records = DbService.shared.fetchTransactions(for: user, limit: 1000)
+        let account = DbService.shared.fetchAccount(for: user)
+        let records = DbService.shared.fetchTransactions(for: user, account: account, limit: 1000)
 
         let calendar = Calendar.current
         let now = Date()

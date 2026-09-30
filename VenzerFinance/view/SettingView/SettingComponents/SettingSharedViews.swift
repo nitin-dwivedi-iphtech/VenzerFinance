@@ -4,7 +4,6 @@
 //
 //  Created by iPHTech 40 on 24/09/26.
 //
-//
 
 import SwiftUI
 
@@ -142,12 +141,6 @@ struct SettingInsetModifier: ViewModifier {
                 : Color("InsideCarTopColor").opacity(opacity),
             in: RoundedRectangle(cornerRadius: radius)
         )
-    }
-}
-
-extension View {
-    func settingInset(_ opacity: Double = 0.38, radius: CGFloat = 16) -> some View {
-        modifier(SettingInsetModifier(opacity: opacity, radius: radius))
     }
 }
 

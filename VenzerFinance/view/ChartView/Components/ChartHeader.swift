@@ -24,12 +24,17 @@ struct ChartHeaderView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Image(systemName: "chart.pie.fill")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 46, height: 46)
-                .background(Color("CardColor").gradient, in: RoundedRectangle(cornerRadius: 15))
-                .shadow(color: Color("CardColor").opacity(0.35), radius: 10, x: 0, y: 5)
+            VStack(alignment: .trailing, spacing: 8) {
+                Image(systemName: "chart.pie.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 46, height: 46)
+                    .background(Color("CardColor").gradient, in: RoundedRectangle(cornerRadius: 15))
+                    .shadow(color: Color("CardColor").opacity(0.35), radius: 10, x: 0, y: 5)
+                    .padding(.bottom, 10)
+                
+                AccountHeaderButton()
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -72,4 +77,8 @@ struct ChartRangePicker: View {
         .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 3)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
+}
+
+#Preview {
+    ChartHeaderView()
 }

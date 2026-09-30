@@ -25,20 +25,28 @@ struct BalanceOverviewHeaderView: View {
 
             Spacer()
 
-            Button {
-                withAnimation(.easeInOut(duration: 0.6)) { spinAngle += 360 }
-                viewModel.refresh()
-            } label: {
-                Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.black)
-                    .frame(width: 40, height: 40)
-                    .background(.white.opacity(0.67), in: Circle())
-                    .rotationEffect(.degrees(spinAngle))
+            VStack(alignment: .trailing, spacing: 8) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.6)) { spinAngle += 360 }
+                    viewModel.refresh()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.black)
+                        .frame(width: 40, height: 40)
+                        .background(.white.opacity(0.67), in: Circle())
+                        .rotationEffect(.degrees(spinAngle))
+                }.padding(.bottom,10)
+
+                AccountHeaderButton()
             }
             .padding(.top, 6)
         }
         .padding(.horizontal, 24)
         .padding(.top, 20)
     }
+}
+
+#Preview {
+    BalanceOverviewHeaderView(viewModel: BalanceOverviewViewModel(), spinAngle: .constant(360.0))
 }

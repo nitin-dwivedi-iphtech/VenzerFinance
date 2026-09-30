@@ -7,6 +7,7 @@
 
 import CoreData
 import Foundation
+import SwiftUI
 
 extension NSManagedObjectContext {
     func saveData() {
@@ -38,5 +39,33 @@ extension String {
             return (integerValue * 100).rounded() / 100
         }
         return 0
+    }
+}
+
+extension UIImage {
+    func scaledToMax(_ maxLength: CGFloat) -> UIImage {
+        let longest = max(size.width, size.height)
+        guard longest > maxLength, longest > 0 else { return self }
+        
+        let scale = maxLength / longest
+        let newSize = CGSize(width: size.width * scale, height: size.height * scale)
+        
+        let renderer = UIGraphicsImageRenderer(size: newSize)
+        return renderer.image { _ in
+            draw(in: CGRect(origin: .zero, size: newSize))
+        }
+    }
+}
+
+extension View {
+    func transactionCard() -> some View {
+        modifier(TransactionCardModifier())
+    }
+    
+    func transactionInnerBox() -> some View {
+        modifier(TransactionInnerBoxModifier())
+    }
+    func settingInset(_ opacity: Double = 0.38, radius: CGFloat = 16) -> some View {
+        modifier(SettingInsetModifier(opacity: opacity, radius: radius))
     }
 }
