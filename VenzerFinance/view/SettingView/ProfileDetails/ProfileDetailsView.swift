@@ -23,7 +23,7 @@ struct PersonalDetailsView: View {
                     customInputField(title: "Email", text: $viewModel.email, icon: "envelope.fill", keyboardType: .emailAddress)
                 }
                 .padding(16)
-                .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
+                .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 20))
                 .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black.opacity(0.06), lineWidth: 1))
                 .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 6)
                 .padding(.horizontal, 16)
@@ -66,54 +66,59 @@ struct PersonalDetailsView: View {
     }
     
     private var profileHeaderCard: some View {
-        VStack(spacing: 12) {
-            ZStack {
-                VStack(spacing: 0) {
-                    Color("InsideCarTopColor").frame(height: 50)
-                    Color("InsideCarBottomColor").frame(height: 50)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-
-                VStack(spacing: 10) {
-                    ZStack(alignment: .bottomTrailing) {
-                        Image("image")
-                            .resizable().scaledToFill()
-                            .frame(width: 84, height: 84).clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white, lineWidth: 3))
-                            .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
-                        Circle()
-                            .fill(Color("CardColor"))
-                            .frame(width: 26, height: 26)
-                            .overlay(Image(systemName: "camera.fill").font(.system(size: 11, weight: .semibold)).foregroundColor(.white))
-                            .overlay(Circle().stroke(Color.white, lineWidth: 2))
-                            .offset(x: 2, y: 2)
-                    }
-                    .padding(.top, 12)
-
-                    VStack(spacing: 2) {
-                        Text(viewModel.fullName.isEmpty ? "—" : viewModel.fullName).font(.system(size: 16, weight: .bold)).foregroundColor(.black)
-                        Text(viewModel.email.isEmpty ? "—" : viewModel.email).font(.system(size: 12)).foregroundColor(.gray).lineLimit(1)
-                    }
-
-                    Button {
-                        // change photo
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "photo.on.rectangle.angled").font(.system(size: 12, weight: .semibold))
-                            Text("Change photo").font(.system(size: 13, weight: .semibold))
-                        }
-                        .foregroundColor(.black)
-                        .padding(.horizontal, 14).padding(.vertical, 7)
-                        .background(Color.white, in: Capsule())
-                        .overlay(Capsule().stroke(Color.black.opacity(0.06), lineWidth: 1))
-                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
-                    }
-                    .padding(.vertical, 14)
-                }
+        VStack(spacing: 0) {
+            VStack(spacing: 0) {
+                Color("InsideCarTopColor").frame(height: 46)
+                Color("InsideCarBottomColor").frame(height: 46)
             }
-            .frame(height: 190)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
             .padding(.horizontal, 16)
+            .padding(.top, 16)
+
+            ZStack(alignment: .bottomTrailing) {
+                Image("image")
+                    .resizable().scaledToFill()
+                    .frame(width: 84, height: 84).clipShape(Circle())
+                    .overlay(Circle().stroke(Color.white, lineWidth: 3))
+                    .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
+                Circle()
+                    .fill(Color("CardColor"))
+                    .frame(width: 26, height: 26)
+                    .overlay(Image(systemName: "camera.fill").font(.system(size: 11, weight: .semibold)).foregroundColor(.white))
+                    .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                    .offset(x: 2, y: 2)
+            }
+            .padding(.top, -46)
+
+            VStack(spacing: 2) {
+                Text(viewModel.fullName.isEmpty ? "—" : viewModel.fullName)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Color("CardText"))
+                Text(viewModel.email.isEmpty ? "—" : viewModel.email)
+                    .font(.system(size: 12))
+                    .foregroundColor(.gray)
+                    .lineLimit(1)
+            }
+            .padding(.top, 8)
+
+            Button {
+                // change photo
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "photo.on.rectangle.angled").font(.system(size: 12, weight: .semibold))
+                    Text("Change photo").font(.system(size: 13, weight: .semibold))
+                }
+                .foregroundColor(.black)
+                .padding(.horizontal, 14).padding(.vertical, 7)
+                .background(Color.white, in: Capsule())
+                .overlay(Capsule().stroke(Color.black.opacity(0.06), lineWidth: 1))
+                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+            }
+            .padding(.vertical, 14)
         }
+        .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 20))
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black.opacity(0.06), lineWidth: 1))
+        .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 6)
         .padding(.horizontal, 16)
     }
     
@@ -134,7 +139,7 @@ struct PersonalDetailsView: View {
             HStack(spacing: 10) {
                 TextField("", text: text)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color("CardText"))
                     .keyboardType(keyboardType)
 
                 if showEditButton {
@@ -149,7 +154,7 @@ struct PersonalDetailsView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 14))
+            .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.black.opacity(0.06), lineWidth: 1))
             .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
         }

@@ -19,11 +19,17 @@ class SettingViewModel: ObservableObject {
     @Published var accountNo: String = ""
     @Published var bankName: String = ""
     @Published var balanceText: String = ""
+
+    private var cancellables = Set<AnyCancellable>()
     
     init() {
         refresh()
         loadUser()
         loadAccount()
+        NotificationCenter.default.publisher(for: .balanceDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.refresh() }
+            .store(in: &cancellables)
     }
     
     func refresh() {
@@ -47,6 +53,9 @@ class SettingViewModel: ObservableObject {
     }
     
     func getCurrencyCode() -> String {
+        if let code = account?.currency, !code.isEmpty {
+            return code
+        }
         if let raw = user?.country, let c = Country(rawValue: raw) {
             return c.currencyCode
         }

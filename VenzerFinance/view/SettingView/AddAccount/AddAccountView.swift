@@ -95,7 +95,7 @@ struct AddAccountView: View {
                 Circle().fill(Color("CardColor")).frame(width: 28, height: 28)
                     .overlay(Image(systemName: "creditcard.fill").font(.system(size: 12, weight: .semibold)).foregroundColor(Color("InsideCarBottomColor")))
                 VStack(alignment: .leading, spacing: 1) {
-                    Text("Account information").font(.system(size: 14, weight: .bold)).foregroundColor(.black)
+                    Text("Account information").font(.system(size: 14, weight: .bold)).foregroundColor(Color("CardText"))
                     Text("As shown on your statement").font(.system(size: 11)).foregroundColor(.gray)
                 }
                 Spacer()
@@ -109,10 +109,10 @@ struct AddAccountView: View {
                 field(title: "Initial Balance", text: $balanceText, icon: "dollarsign.circle.fill", placeholder: "0.00", keyboard: .decimalPad)
             }
             .padding(12)
-            .background(Color("InsideCarTopColor").opacity(0.38), in: RoundedRectangle(cornerRadius: 16))
+            .settingInset()
         }
         .padding(16)
-        .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
+        .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 20))
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black.opacity(0.06), lineWidth: 1))
         .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 6)
         .padding(.horizontal, 16)
@@ -136,7 +136,7 @@ struct AddAccountView: View {
             HStack(spacing: 8) {
                 TextField(placeholder, text: text)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color("CardText"))
                     .keyboardType(keyboard)
                 
                 Image(systemName: "pencil.circle.fill")
@@ -145,7 +145,7 @@ struct AddAccountView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 12))
+            .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.06), lineWidth: 1))
             .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
         }

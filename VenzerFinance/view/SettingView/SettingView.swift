@@ -16,7 +16,7 @@ struct SettingView: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Account hub").font(.system(size: 22, weight: .bold)).foregroundColor(.black)
+                    Text("Account hub").font(.system(size: 22, weight: .bold)).foregroundColor(Color("CardText"))
                     Text("Manage profile & billing").font(.system(size: 12)).foregroundColor(.gray)
                 }
                 Spacer()
@@ -27,7 +27,7 @@ struct SettingView: View {
                     }
                     .foregroundColor(.red)
                     .padding(.horizontal, 14).padding(.vertical, 9)
-                    .background(Color.white, in: Capsule())
+                    .background(Color("CardBackground"), in: Capsule())
                     .overlay(Capsule().stroke(Color.red.opacity(0.12), lineWidth: 1))
                 }
             }
@@ -47,7 +47,7 @@ struct SettingView: View {
                 .padding(.top, 18)
                 .padding(.bottom, 110)
             }
-            .background(Color.white.opacity(0.72).clipShape(CustomCornerShape(corners: [.topLeft, .topRight], radius: 32)))
+            .background(Color("CardBackground").opacity(0.72).clipShape(CustomCornerShape(corners: [.topLeft, .topRight], radius: 32)))
             .ignoresSafeArea(edges: .bottom)
         }
         .background { CustomBackgroundView() }

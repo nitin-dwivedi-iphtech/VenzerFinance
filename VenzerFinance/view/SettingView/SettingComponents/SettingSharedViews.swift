@@ -40,7 +40,7 @@ struct SettingCardContainer<Content: View>: View {
                     .overlay(Image(systemName: iconName).font(.system(size: 12, weight: .semibold))
                         .foregroundColor(Color("InsideCarBottomColor")))
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(title).font(.system(size: 14, weight: .bold)).foregroundColor(.black)
+                    Text(title).font(.system(size: 14, weight: .bold)).foregroundColor(Color("CardText"))
                     Text(subtitle).font(.system(size: 11)).foregroundColor(.gray)
                 }
                 Spacer()
@@ -52,16 +52,16 @@ struct SettingCardContainer<Content: View>: View {
                             .resizable()
                             .frame(width: 25, height: 25)
                             .clipShape(Circle())
-                            .foregroundStyle(.black)
+                            .foregroundStyle(Color("CardText"))
                     }
                 }
             }
             content
                 .padding(4)
-                .background(Color("InsideCarTopColor").opacity(0.38), in: RoundedRectangle(cornerRadius: 16))
+                .settingInset()
         }
         .padding(16)
-        .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
+        .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 20))
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black.opacity(0.06), lineWidth: 1))
         .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 6)
     }
@@ -81,7 +81,7 @@ struct SimpleRow: View {
             
             Text(title)
                 .font(.system(size: 13))
-                .foregroundColor(.black.opacity(0.8))
+                .foregroundColor(.primary)
             
             Spacer()
             
@@ -105,7 +105,7 @@ struct CountryRow: View {
                     .font(.system(size: 12))
                     .foregroundColor(Color("CardColor")))
             
-            Text("Country").font(.system(size: 13)).foregroundColor(.black.opacity(0.8))
+            Text("Country").font(.system(size: 13)).foregroundColor(.primary)
             
             Spacer()
             
@@ -123,7 +123,32 @@ struct CountryRow: View {
 
 // Simple divider
 struct SimpleDivider: View {
-    var body: some View { Divider().opacity(0.06).padding(.horizontal, 10) }
+    var body: some View {
+        Divider()
+            .overlay(Color("CardText").opacity(0.12))
+            .padding(.horizontal, 10)
+    }
+}
+
+struct SettingInsetModifier: ViewModifier {
+    @Environment(\.colorScheme) private var scheme
+    var opacity: Double = 0.38
+    var radius: CGFloat = 16
+
+    func body(content: Content) -> some View {
+        content.background(
+            scheme == .dark
+                ? Color.white.opacity(0.07)
+                : Color("InsideCarTopColor").opacity(opacity),
+            in: RoundedRectangle(cornerRadius: radius)
+        )
+    }
+}
+
+extension View {
+    func settingInset(_ opacity: Double = 0.38, radius: CGFloat = 16) -> some View {
+        modifier(SettingInsetModifier(opacity: opacity, radius: radius))
+    }
 }
 
 // Shape for top corners

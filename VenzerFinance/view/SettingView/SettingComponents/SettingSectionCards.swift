@@ -36,16 +36,16 @@ struct EmptyAccountCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color("CardColor").opacity(0.09))
+                Circle().fill(Color.white)
                     .frame(width: 46, height: 46)
                     .overlay(Image(systemName: "creditcard.trianglebadge.exclamationmark")
                         .font(.system(size: 20)).foregroundColor(Color("CardColor")))
+                    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                 
                 VStack(alignment: .leading, spacing: 3) {
                     Text("No account connected")
                         .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(.black)
+                        .foregroundColor(Color("CardText"))
                     
                     Text(Constants.accountNotFoundDesc.rawValue)
                         .font(.system(size: 12))
@@ -62,7 +62,7 @@ struct EmptyAccountCard: View {
             }
         }
         .padding(16)
-        .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
+        .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 6)
     }
 }
@@ -74,38 +74,44 @@ struct LinkedAccountCard: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("Linked account", systemImage: "checkmark.seal.fill")
-                    .font(.system(size: 12, weight: .bold)).foregroundColor(Color("CardColor"))
+                    .font(.system(size: 12, weight: .bold)).foregroundColor(.green)
                     .padding(.horizontal, 10).padding(.vertical, 6)
                 Spacer()
-                
+
             }
             VStack(spacing: 10) {
                 HStack {
-                    Image(systemName: "number").foregroundColor(Color("CardColor"))
+                    Circle().fill(Color.white).frame(width: 30, height: 30)
+                        .overlay(Image(systemName: "number").font(.system(size: 12, weight: .semibold)).foregroundColor(Color("CardColor")))
+                        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     Text("Account No.").font(.system(size: 12)).foregroundColor(.gray)
                     Spacer()
                     Text(account.account_no ?? "—").font(.system(size: 12, weight: .semibold))
                 }
-                Divider().opacity(0.06)
+                Divider().overlay(Color("CardText").opacity(0.12))
                 HStack {
-                    Image(systemName: "building.columns").foregroundColor(Color("CardColor"))
+                    Circle().fill(Color.white).frame(width: 30, height: 30)
+                        .overlay(Image(systemName: "building.columns").font(.system(size: 12, weight: .semibold)).foregroundColor(Color("CardColor")))
+                        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     Text("Bank").font(.system(size: 12)).foregroundColor(.gray)
                     Spacer()
                     Text(account.bankName ?? "—").font(.system(size: 12, weight: .semibold))
                 }
-                Divider().opacity(0.06)
+                Divider().overlay(Color("CardText").opacity(0.12))
                 HStack {
-                    Image(systemName: "dollarsign.circle").foregroundColor(Color("CardColor"))
+                    Circle().fill(Color.white).frame(width: 30, height: 30)
+                        .overlay(Image(systemName: "dollarsign.circle").font(.system(size: 12, weight: .semibold)).foregroundColor(Color("CardColor")))
+                        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     Text("Balance").font(.system(size: 12)).foregroundColor(.gray)
                     Spacer()
                     Text(getBalance()).font(.system(size: 12, weight: .semibold))
                 }
             }
             .padding(14)
-            .background(Color("InsideCarTopColor").opacity(0.55), in: RoundedRectangle(cornerRadius: 14))
+            .settingInset(0.55, radius: 14)
         }
         .padding(16)
-        .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
+        .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 6)
     }
     
@@ -181,6 +187,7 @@ struct AccountDetailsCard: View {
 struct PreferencesCard: View {
     var user: User?
     @State private var pushOn = true
+    @AppStorage("forceDarkMode") private var forceDarkMode = false
     
     var body: some View {
         SettingCardContainer(title: "Preferences", subtitle: "App experience", iconName: "slider.horizontal.3", showEditBtn: false) {
@@ -191,6 +198,18 @@ struct PreferencesCard: View {
                     Text("Push Notifications").font(.system(size: 13))
                     Spacer()
                     Toggle("", isOn: $pushOn).labelsHidden().tint(Color("CardColor"))
+                }
+                .padding(10)
+                SimpleDivider()
+                HStack(spacing: 12) {
+                    Circle().fill(Color.white).frame(width: 30, height: 30)
+                        .overlay(Image(systemName: "moon.fill").foregroundColor(Color("CardColor")))
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Dark Mode").font(.system(size: 13))
+                        Text(forceDarkMode ? "On" : "Follows system").font(.system(size: 11)).foregroundColor(.gray)
+                    }
+                    Spacer()
+                    Toggle("", isOn: $forceDarkMode).labelsHidden().tint(Color("CardColor"))
                 }
                 .padding(10)
                 SimpleDivider()

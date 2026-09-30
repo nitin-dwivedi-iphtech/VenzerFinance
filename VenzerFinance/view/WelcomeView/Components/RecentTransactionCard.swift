@@ -41,13 +41,13 @@ struct RecentTransactionCard: View {
                 Button(action: {}) {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 24))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(Color("CardText"))
                 }
             }
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: 150)
-        .background(.white, in: RoundedRectangle(cornerRadius: 15))
+        .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 15))
         .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
     }
 }

@@ -32,7 +32,7 @@ struct CustomTextField: View {
                 if isSecure && !isVisible {
                     SecureField("", text: $text, prompt: Text(prompt).foregroundColor(.gray.opacity(0.55)))
                         .font(.system(size: 15))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(Color("CardText"))
                         .focused($isFocused)
                         .textContentType(isSecure ? .password : .none)
                         .autocorrectionDisabled(true)
@@ -40,7 +40,7 @@ struct CustomTextField: View {
                 } else {
                     TextField("", text: $text, prompt: Text(prompt).foregroundColor(.gray.opacity(0.55)))
                         .font(.system(size: 15))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(Color("CardText"))
                         .focused($isFocused)
                         .autocorrectionDisabled(true)
                         .textInputAutocapitalization(.never)
@@ -62,7 +62,7 @@ struct CustomTextField: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 14)
-        .background(Color.white)
+        .background(Color("CardBackground"))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)

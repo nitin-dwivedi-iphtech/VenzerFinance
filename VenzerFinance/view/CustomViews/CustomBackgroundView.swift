@@ -28,7 +28,7 @@ struct CustomBackgroundView:View {
                 ZStack {
                     Text("v")
                         .font(.system(size: proxy.size.width * 1.8, weight: .bold))
-                        .foregroundColor(Color.black.opacity(0.025))
+                        .foregroundColor(Color("CardText").opacity(0.04))
                         .rotationEffect(.degrees(-261))
                         .offset(
                             x: proxy.size.width * 0.85,
@@ -37,7 +37,7 @@ struct CustomBackgroundView:View {
                     
                     Text("v")
                         .font(.system(size: proxy.size.width * 1.8, weight: .bold))
-                        .foregroundColor(Color.black.opacity(0.025))
+                        .foregroundColor(Color("CardText").opacity(0.04))
                         .rotationEffect(.degrees(-27))
                         .offset(
                             x: -proxy.size.width * 0.5,

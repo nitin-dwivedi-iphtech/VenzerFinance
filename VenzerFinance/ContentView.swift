@@ -39,7 +39,7 @@ struct ContentView: View {
 
 struct subView: View {
     @State private var currentTab: Tab = .home
-
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             // Tab content switcher
@@ -47,20 +47,22 @@ struct subView: View {
                 switch currentTab {
                 case .home:
                     WelcomeView()
+                    
                 case .balanceOverview:
                     BalanceOverviewView()
+                    
                 case .chart:
-                    Text("Chart View")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    ChartView()
                 case .setting:
                     SettingView()
+                    
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             // Custom bottom tab bar
             BottomNavigation(currentTab: $currentTab)
-                .padding(.bottom, 3)
+               
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
     }

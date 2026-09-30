@@ -9,6 +9,7 @@ import SwiftUI
 struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
+    @State private var errorMessage: String?
     @Binding var signUp: Bool
     @Binding var isLoading: Bool
 
@@ -21,6 +22,14 @@ struct LoginView: View {
         VStack(spacing: 18) {
             header
             formCard
+        }
+        .alert("Sign In Failed", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { errorMessage = nil }
+        } message: {
+            Text(errorMessage ?? "Something went wrong.")
         }
     }
 
@@ -38,7 +47,7 @@ struct LoginView: View {
                     )
                 Text("Welcome Back!")
                     .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color("CardText"))
                 Spacer()
             }
             Text(Constants.loginViewSubHeading.rawValue)
@@ -84,15 +93,19 @@ struct LoginView: View {
                 }
             }
 
-            // Primary CTA
             Button {
                 focusedField = nil
-                guard Helper.isFormValid(for: [email, password]) else { return }
+                guard Helper.isFormValid(for: [email, password]) else {
+                    errorMessage = "Please enter your email and password."
+                    return
+                }
                 withAnimation { isLoading = true }
-                // small delay to show loading shimmer that matches app theme
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    _ = authViewModel.loginUser(email: email.trimmingCharacters(in: .whitespaces), password: password)
+                    let ok = authViewModel.loginUser(email: email.trimmingCharacters(in: .whitespaces), password: password)
                     isLoading = false
+                    if !ok {
+                        errorMessage = "Invalid email or password. Please try again."
+                    }
                 }
             } label: {
                 HStack(spacing: 8) {
@@ -148,12 +161,12 @@ struct LoginView: View {
         .padding(.vertical, 20)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Color.white)
+                .fill(Color("CardBackground"))
                 .shadow(color: Color.black.opacity(0.07), radius: 18, x: 0, y: 10)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Color.white.opacity(0.9), lineWidth: 1)
+                .stroke(Color("CardText").opacity(0.1), lineWidth: 1)
         )
     }
 
@@ -162,12 +175,6 @@ struct LoginView: View {
             Rectangle()
                 .fill(Color.black.opacity(0.06))
                 .frame(height: 1)
-            Text("OR")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(.gray.opacity(0.6))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 4)
-                .background(Color("InsideCarTopColor"), in: Capsule())
             Rectangle()
                 .fill(Color.black.opacity(0.06))
                 .frame(height: 1)
@@ -183,10 +190,10 @@ struct LoginView: View {
                 Text(title)
                     .font(.system(size: 13.5, weight: .semibold))
             }
-            .foregroundStyle(.black.opacity(0.85))
+            .foregroundStyle(Color("CardText").opacity(0.85))
             .frame(maxWidth: .infinity)
             .frame(height: 46)
-            .background(Color.white)
+            .background(Color("CardBackground"))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)

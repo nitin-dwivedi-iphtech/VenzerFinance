@@ -77,7 +77,7 @@ struct SubSplashView: View {
                 VStack(spacing: 6) {
                     Text("Venzer Finance")
                         .font(.system(size: 30, weight: .bold))
-                        .foregroundStyle(.black.opacity(0.9))
+                        .foregroundStyle(Color("CardText").opacity(0.9))
                     
                     Text("Smart wealth management")
                         .font(.system(size: 13, weight: .medium))

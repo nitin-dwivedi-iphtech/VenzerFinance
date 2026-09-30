@@ -7,48 +7,36 @@
 
 import SwiftUI
 
-
-struct TransactionItem: Identifiable {
-    let id = UUID()
-    let title: String
-    let detail: String
-    let icon: String
-    let amount: String
-    let isCredit: Bool
-}
-
-// Dummy data
-
-let dummyTransactions: [TransactionItem] = [
-    TransactionItem(title: "Salary Deposit", detail: "Income • Sep 24", icon: "banknote.fill", amount: "+$3,200.00", isCredit: true),
-    TransactionItem(title: "Netflix", detail: "Entertainment • Sep 24", icon: "play.tv.fill", amount: "-$15.99", isCredit: false),
-    TransactionItem(title: "Starbucks Coffee", detail: "Food & Drinks • Sep 23", icon: "cup.and.saucer.fill", amount: "-$6.45", isCredit: false),
-    TransactionItem(title: "Amazon Order", detail: "Shopping • Sep 23", icon: "bag.fill", amount: "-$89.99", isCredit: false),
-    TransactionItem(title: "Freelance Payment", detail: "Income • Sep 22", icon: "briefcase.fill", amount: "+$450.00", isCredit: true),
-    TransactionItem(title: "Uber Ride", detail: "Transport • Sep 22", icon: "car.fill", amount: "-$23.50", isCredit: false),
-    TransactionItem(title: "Electricity Bill", detail: "Bills • Sep 21", icon: "bolt.fill", amount: "-$112.30", isCredit: false)
-]
-
-
 struct TransactionsCard: View {
+    let transactions: [TransactionItem]
+    var onSeeAll: () -> Void = {}
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
 
-            ForEach(Array(dummyTransactions.enumerated()), id: \.element.id) { index, transaction in
-                TransactionRow(transaction: transaction)
-                    .padding(.vertical, 10)
+            if transactions.isEmpty {
+                Text("No transactions yet")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.gray)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 16)
+            } else {
+                ForEach(Array(transactions.prefix(7).enumerated()), id: \.element.id) { index, transaction in
+                    TransactionRow(transaction: transaction)
+                        .padding(.vertical, 10)
 
-                if index < dummyTransactions.count - 1 {
-                    Divider()
-                        .overlay(Color.black.opacity(0.05))
+                    if index < transactions.count - 1 {
+                        Divider()
+                            .overlay(Color.black.opacity(0.05))
+                    }
                 }
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.white, in: RoundedRectangle(cornerRadius: 15))
+        .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 15))
         .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
         .padding(.horizontal, 20)
     }
@@ -57,14 +45,14 @@ struct TransactionsCard: View {
         HStack {
             Text("Transactions")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.black)
+                .foregroundStyle(Color("CardText"))
 
             Spacer()
 
-            Button(action: {}) {
+            Button(action: onSeeAll) {
                 Text("See All")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(Color("CardColor").opacity(0.7))
+                    .foregroundStyle(Color("CardText").opacity(0.6))
             }
         }
         .padding(.bottom, 6)
@@ -86,7 +74,7 @@ private struct TransactionRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(transaction.title)
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color("CardText"))
 
                 Text(transaction.detail)
                     .font(.system(size: 10))
@@ -104,8 +92,4 @@ private struct TransactionRow: View {
                 )
         }
     }
-}
-
-#Preview {
-    TransactionsCard()
 }

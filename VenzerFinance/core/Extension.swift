@@ -6,6 +6,7 @@
 //
 
 import CoreData
+import Foundation
 
 extension NSManagedObjectContext {
     func saveData() {
@@ -27,3 +28,15 @@ extension NSManagedObjectContext {
     }
 }
 
+extension Notification.Name {
+    static let balanceDidChange = Notification.Name("balanceDidChange")
+}
+
+extension String {
+    func fromStringToDouble(value: String) -> Double {
+        if let integerValue = Double(value) {
+            return (integerValue * 100).rounded() / 100
+        }
+        return 0
+    }
+}

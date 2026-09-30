@@ -13,6 +13,7 @@ struct SignUpView: View {
     @State private var password: String = ""
     @State private var name: String = ""
     @State private var country: Country = .india
+    @State private var errorMessage: String?
     @Binding var signUp: Bool
     @Binding var isLoading: Bool
 
@@ -25,6 +26,14 @@ struct SignUpView: View {
         VStack(spacing: 18) {
             header
             formCard
+        }
+        .alert("Sign Up Failed", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { errorMessage = nil }
+        } message: {
+            Text(errorMessage ?? "Something went wrong.")
         }
     }
 
@@ -39,7 +48,7 @@ struct SignUpView: View {
                 }
                 Text("Create Account")
                     .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color("CardText"))
                 Spacer()
             }
             Text("Join Venzer — smart wealth management for everyone")
@@ -84,11 +93,17 @@ struct SignUpView: View {
 
             Button {
                 focusedField = nil
-                guard Helper.isFormValid(for: [email, password, name, country.rawValue]) else { return }
+                guard Helper.isFormValid(for: [email, password, name, country.rawValue]) else {
+                    errorMessage = "Please fill in your name, email and password."
+                    return
+                }
                 withAnimation { isLoading = true }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    _ = authViewModel.createUser(email: email.trimmingCharacters(in: .whitespaces), password: password, name: name.trimmingCharacters(in: .whitespaces), country: country.rawValue)
+                    let ok = authViewModel.createUser(email: email.trimmingCharacters(in: .whitespaces), password: password, name: name.trimmingCharacters(in: .whitespaces), country: country.rawValue)
                     isLoading = false
+                    if !ok {
+                        errorMessage = "Account could not be created. This email may already exist."
+                    }
                 }
             } label: {
                 HStack(spacing: 8) {
@@ -139,12 +154,12 @@ struct SignUpView: View {
         .padding(.vertical, 20)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Color.white)
+                .fill(Color("CardBackground"))
                 .shadow(color: Color.black.opacity(0.07), radius: 18, x: 0, y: 10)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Color.white.opacity(0.9), lineWidth: 1)
+                .stroke(Color("CardText").opacity(0.1), lineWidth: 1)
         )
     }
 
@@ -159,7 +174,7 @@ struct SignUpView: View {
 
             Text("Country")
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(.black.opacity(0.75))
+                .foregroundStyle(Color("CardText").opacity(0.75))
 
             Spacer()
 
@@ -168,8 +183,6 @@ struct SignUpView: View {
                     ForEach(Country.allCases) { item in
                         Label(item.rawValue.capitalized, image: item.flagImageName)
                             .tag(item)
-                        // Fallback text if image label fails
-                        // Text(item.rawValue).tag(item)
                     }
                 }
             } label: {
@@ -194,11 +207,10 @@ struct SignUpView: View {
                 .background(Color("InsideCarTopColor"), in: Capsule())
                 .overlay(Capsule().stroke(Color.black.opacity(0.06), lineWidth: 1))
             }
-            .tint(.black)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
-        .background(Color.white)
+        .background(Color("CardBackground"))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.black.opacity(0.06), lineWidth: 1))
         .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
@@ -207,12 +219,6 @@ struct SignUpView: View {
     private var divider: some View {
         HStack(spacing: 12) {
             Rectangle().fill(Color.black.opacity(0.06)).frame(height: 1)
-            Text("OR")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(.gray.opacity(0.6))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 4)
-                .background(Color("InsideCarTopColor"), in: Capsule())
             Rectangle().fill(Color.black.opacity(0.06)).frame(height: 1)
         }
         .padding(.vertical, 2)
@@ -224,10 +230,10 @@ struct SignUpView: View {
                 Image(systemName: icon).font(.system(size: 15, weight: .semibold))
                 Text(title).font(.system(size: 13.5, weight: .semibold))
             }
-            .foregroundStyle(.black.opacity(0.85))
+            .foregroundStyle(Color("CardText").opacity(0.85))
             .frame(maxWidth: .infinity)
             .frame(height: 46)
-            .background(Color.white)
+            .background(Color("CardBackground"))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.black.opacity(0.06), lineWidth: 1))
             .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
