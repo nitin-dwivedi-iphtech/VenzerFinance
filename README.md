@@ -94,3 +94,13 @@ Known gaps: no email-format or password-strength rules, `balanceText` numeric ch
 
 - **Notifications:** alert / sound / badge (debit alerts).
 - **Photos:** profile photo picker (read-only).
+
+## Demo
+
+https://github.com/user-attachments/assets/145e87d5-a024-4481-b627-56df40ef4507
+
+
+
+
+
+
