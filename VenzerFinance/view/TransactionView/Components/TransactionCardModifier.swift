@@ -17,18 +17,6 @@ struct TransactionCardModifier: ViewModifier {
     }
 }
 
-extension View {
-    func transactionCard() -> some View {
-        modifier(TransactionCardModifier())
-    }
-
-    func transactionInnerBox() -> some View {
-        modifier(TransactionInnerBoxModifier())
-    }
-}
-
-/// Inset box inside transaction cards. Light mode keeps the pastel look;
-/// dark mode uses a subtle white fill so content stays readable.
 struct TransactionInnerBoxModifier: ViewModifier {
     @Environment(\.colorScheme) private var scheme
 

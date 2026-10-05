@@ -4,12 +4,14 @@
 //
 //  Created by iPHTech 40 on 24/09/26.
 //
-//
+
+import PhotosUI
 import SwiftUI
 
 struct PersonalDetailsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject  var viewModel:SettingViewModel
+    @State private var photoItem: PhotosPickerItem?
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -32,6 +34,7 @@ struct PersonalDetailsView: View {
                     if viewModel.isValid() {
                         viewModel.savePersonalDetails()
                     }
+                    viewModel.saveProfilePhoto()
                     dismiss()
                 } label: {
                     HStack(spacing: 8) {
@@ -76,19 +79,24 @@ struct PersonalDetailsView: View {
             .padding(.top, 16)
 
             ZStack(alignment: .bottomTrailing) {
-                Image("image")
-                    .resizable().scaledToFill()
-                    .frame(width: 84, height: 84).clipShape(Circle())
-                    .overlay(Circle().stroke(Color.white, lineWidth: 3))
-                    .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
+                PhotosPicker(selection: $photoItem, matching: .images) {
+                    UserAvatarView(imageData: viewModel.profileImageData, size: 84)
+                        .overlay(Circle().stroke(Color.white, lineWidth: 3))
+                        .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
+                }
+                .buttonStyle(.plain)
                 Circle()
                     .fill(Color("CardColor"))
                     .frame(width: 26, height: 26)
                     .overlay(Image(systemName: "camera.fill").font(.system(size: 11, weight: .semibold)).foregroundColor(.white))
                     .overlay(Circle().stroke(Color.white, lineWidth: 2))
                     .offset(x: 2, y: 2)
+                    .allowsHitTesting(false)
             }
             .padding(.top, -46)
+            .onChange(of: photoItem) { _, newItem in
+                loadPhoto(from: newItem)
+            }
 
             VStack(spacing: 2) {
                 Text(viewModel.fullName.isEmpty ? "—" : viewModel.fullName)
@@ -101,18 +109,37 @@ struct PersonalDetailsView: View {
             }
             .padding(.top, 8)
 
-            Button {
-                // change photo
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "photo.on.rectangle.angled").font(.system(size: 12, weight: .semibold))
-                    Text("Change photo").font(.system(size: 13, weight: .semibold))
+            HStack(spacing: 10) {
+                PhotosPicker(selection: $photoItem, matching: .images) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "photo.on.rectangle.angled").font(.system(size: 12, weight: .semibold))
+                        Text(viewModel.profileImageData == nil ? "Change photo" : "Choose another").font(.system(size: 13, weight: .semibold))
+                    }
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 14).padding(.vertical, 7)
+                    .background(Color.white, in: Capsule())
+                    .overlay(Capsule().stroke(Color.black.opacity(0.06), lineWidth: 1))
+                    .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
                 }
-                .foregroundColor(.black)
-                .padding(.horizontal, 14).padding(.vertical, 7)
-                .background(Color.white, in: Capsule())
-                .overlay(Capsule().stroke(Color.black.opacity(0.06), lineWidth: 1))
-                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                .buttonStyle(.plain)
+
+                if viewModel.profileImageData != nil {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            viewModel.profileImageData = nil
+                            photoItem = nil
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "trash").font(.system(size: 12, weight: .semibold))
+                            Text("Remove").font(.system(size: 13, weight: .semibold))
+                        }
+                        .foregroundColor(.red)
+                        .padding(.horizontal, 14).padding(.vertical, 7)
+                        .background(Color.red.opacity(0.08), in: Capsule())
+                        .overlay(Capsule().stroke(Color.red.opacity(0.2), lineWidth: 1))
+                    }
+                }
             }
             .padding(.vertical, 14)
         }
@@ -122,6 +149,19 @@ struct PersonalDetailsView: View {
         .padding(.horizontal, 16)
     }
     
+    private func loadPhoto(from item: PhotosPickerItem?) {
+        guard let item else { return }
+        Task {
+            guard let data = try? await item.loadTransferable(type: Data.self),
+                  let uiImage = UIImage(data: data) else { return }
+            let scaled = uiImage.scaledToMax(512)
+            let jpeg = scaled.jpegData(compressionQuality: 0.75)
+            await MainActor.run {
+                viewModel.profileImageData = jpeg
+            }
+        }
+    }
+
     private func customInputField(
         title: String,
         text: Binding<String>,

@@ -90,7 +90,7 @@ class BalanceOverviewViewModel: ObservableObject {
         formatter.dateFormat = "MMMM"
         monthName = formatter.string(from: Date())
 
-        let records = DbService.shared.fetchTransactions(for: user, limit: 1000)
+        let records = DbService.shared.fetchTransactions(for: user, account: account, limit: 1000)
         let calendar = Calendar.current
         let now = Date()
         let monthValues = records.compactMap { tx -> Double? in

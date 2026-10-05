@@ -4,12 +4,12 @@
 //
 //  Created by iPHTech 40 on 24/09/26.
 //
-//
 
 import SwiftUI
 
 struct AccountCardView: View {
     @State var showTransactionSheet:Bool = false
+    @State private var showDepositSheet = false
     
     var displayName: String
     var balanceText: String
@@ -80,7 +80,7 @@ struct AccountCardView: View {
             )
             
             HStack(spacing: 12) {
-                Button(action: {}) {
+                Button(action: { showDepositSheet = true }) {
                     Label("Deposit", systemImage: "square.and.arrow.down")
                         .font(.subheadline).frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
@@ -104,6 +104,11 @@ struct AccountCardView: View {
         .sheet(isPresented: $showTransactionSheet) {
             NavigationStack {
                 TransactionAccountView()
+            }
+        }
+        .sheet(isPresented: $showDepositSheet) {
+            NavigationStack {
+                DepositView()
             }
         }
     }

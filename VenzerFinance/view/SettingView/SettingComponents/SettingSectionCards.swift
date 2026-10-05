@@ -4,21 +4,82 @@
 //
 //  Created by iPHTech 40 on 24/09/26.
 //
-//
 
 import SwiftUI
 
 struct AccountStatusCard: View {
-    
+
     @ObservedObject var viewModel: SettingViewModel
+    @Environment(\.colorScheme) private var scheme
     @State private var showAddAccount: Bool = false
-    
+    @State private var showManage: Bool = false
+
+    private var accent: Color {
+        scheme == .dark ? Color("InsideCarBottomColor") : Color("CardColor")
+    }
+
     var body: some View {
         Group {
-            if viewModel.account == nil {
+            if viewModel.accounts.isEmpty {
                 EmptyAccountCard(viewModel: viewModel) { showAddAccount = true }
-            } else {
-                LinkedAccountCard(account: viewModel.account!)
+            } else if let primary = viewModel.primaryAccount {
+                VStack(spacing: 10) {
+                    HStack(spacing: 8) {
+                        Text("Accounts")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(.gray)
+                            .tracking(0.4)
+                        Text("\(viewModel.accounts.count)")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(scheme == .dark ? Color.black : .white)
+                            .frame(minWidth: 20, minHeight: 20)
+                            .background(accent, in: Capsule())
+                        Spacer(minLength: 0)
+                        Button {
+                            showAddAccount = true
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 10, weight: .bold))
+                                Text("Add")
+                                    .font(.system(size: 11, weight: .bold))
+                            }
+                            .foregroundStyle(scheme == .dark ? Color.black : .white)
+                            .padding(.horizontal, 10).padding(.vertical, 6)
+                            .background(accent, in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, 4)
+
+                    LinkedAccountCard(
+                        account: primary,
+                        isSelected: true,
+                        badge: "Primary",
+                        onSelect: nil
+                    )
+                    if viewModel.accounts.count > 1 {
+                        Button {
+                            showManage = true
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "wallet.pass.fill")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundStyle(accent)
+                                Text("View all \(viewModel.accounts.count) accounts")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(Color("CardText"))
+                                Spacer(minLength: 0)
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundColor(accent)
+                            }
+                            .padding(.horizontal, 14).padding(.vertical, 11)
+                            .background(accent.opacity(scheme == .dark ? 0.14 : 0.08), in: RoundedRectangle(cornerRadius: 12))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
             }
         }
         .sheet(isPresented: $showAddAccount) {
@@ -26,6 +87,20 @@ struct AccountStatusCard: View {
                 AddAccountView(viewModel: viewModel)
                     .presentationDetents([.medium, .large])
             }
+            .onDisappear { viewModel.refresh() }
+        }
+        .onChange(of: showAddAccount) { _, isShowing in
+            if !isShowing { viewModel.refresh() }
+        }
+        .sheet(isPresented: $showManage) {
+            NavigationStack {
+                AccountDetailsView(viewModel: viewModel)
+                    .presentationDetents([.medium, .large])
+            }
+            .onDisappear { viewModel.refresh() }
+        }
+        .onChange(of: showManage) { _, isShowing in
+            if !isShowing { viewModel.refresh() }
         }
     }
 }
@@ -69,16 +144,25 @@ struct EmptyAccountCard: View {
 
 struct LinkedAccountCard: View {
     var account: Account
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Label("Linked account", systemImage: "checkmark.seal.fill")
-                    .font(.system(size: 12, weight: .bold)).foregroundColor(.green)
-                    .padding(.horizontal, 10).padding(.vertical, 6)
-                Spacer()
+    var isSelected: Bool = true
+    var badge: String? = nil
+    var onSelect: (() -> Void)? = nil
 
-            }
+    var body: some View {
+        Button {
+            onSelect?()
+        } label: {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Label(badge ?? (isSelected ? "Selected account" : "Linked account"), systemImage: "checkmark.seal.fill")
+                        .font(.system(size: 12, weight: .bold)).foregroundColor(.green)
+                        .padding(.horizontal, 10).padding(.vertical, 6)
+                    Spacer()
+                    if onSelect != nil, !isSelected {
+                        Text("Tap to select")
+                            .font(.system(size: 11, weight: .medium)).foregroundColor(.gray)
+                    }
+                }
             VStack(spacing: 10) {
                 HStack {
                     Circle().fill(Color.white).frame(width: 30, height: 30)
@@ -86,7 +170,7 @@ struct LinkedAccountCard: View {
                         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     Text("Account No.").font(.system(size: 12)).foregroundColor(.gray)
                     Spacer()
-                    Text(account.account_no ?? "—").font(.system(size: 12, weight: .semibold))
+                    Text(account.account_no ?? "—").font(.system(size: 12, weight: .semibold)).foregroundColor(Color("CardText"))
                 }
                 Divider().overlay(Color("CardText").opacity(0.12))
                 HStack {
@@ -95,7 +179,7 @@ struct LinkedAccountCard: View {
                         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     Text("Bank").font(.system(size: 12)).foregroundColor(.gray)
                     Spacer()
-                    Text(account.bankName ?? "—").font(.system(size: 12, weight: .semibold))
+                    Text(account.bankName ?? "—").font(.system(size: 12, weight: .semibold)).foregroundColor(Color("CardText"))
                 }
                 Divider().overlay(Color("CardText").opacity(0.12))
                 HStack {
@@ -104,15 +188,21 @@ struct LinkedAccountCard: View {
                         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     Text("Balance").font(.system(size: 12)).foregroundColor(.gray)
                     Spacer()
-                    Text(getBalance()).font(.system(size: 12, weight: .semibold))
+                    Text(getBalance()).font(.system(size: 12, weight: .semibold)).foregroundColor(Color("CardText"))
                 }
             }
             .padding(14)
             .settingInset(0.55, radius: 14)
+            }
         }
         .padding(16)
         .background(Color("CardBackground"), in: RoundedRectangle(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(isSelected ? Color("CardColor").opacity(0.35) : Color.clear, lineWidth: 1.5)
+        )
         .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 6)
+        .buttonStyle(.plain)
     }
     
     func getBalance() -> String {
