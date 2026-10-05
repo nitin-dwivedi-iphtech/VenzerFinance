@@ -237,12 +237,22 @@ class DbService: ObservableObject {
     func sendMoney(amount: Double, from account: Account?, for user: User?, to recipientUserId: String? = nil) -> Bool {
         guard let account, amount > 0, account.balance >= amount else { return false }
         account.balance -= amount
+        var debitDetail: String?
         if let recipientId = recipientUserId {
             let request: NSFetchRequest<Account> = Account.fetchRequest()
             request.predicate = NSPredicate(format: "user_id == %@", recipientId as CVarArg)
             request.fetchLimit = 1
             if let recipientAccount = (try? context.fetch(request))?.first {
                 recipientAccount.balance += amount
+                let destBank: String = {
+                    if let b = recipientAccount.bankName, !b.isEmpty { return b }
+                    return "recipient account"
+                }()
+                if let destNo = recipientAccount.account_no, destNo.count >= 4 {
+                    debitDetail = "to \(destBank) ••\(destNo.suffix(4))"
+                } else {
+                    debitDetail = "to \(destBank)"
+                }
                 recordTransaction(
                     amount: amount,
                     from: recipientAccount,
@@ -250,10 +260,13 @@ class DbService: ObservableObject {
                     forUserId: recipientAccount.user_id ?? recipientId,
                     type: "credit"
                 )
+            } else {
+                debitDetail = "sent"
             }
         }
         recordTransaction(amount: amount, from: account, for: user, type: "debit")
         context.saveData()
+        NotificationManager.shared.notifyDebit(amount: amount, from: account, detail: debitDetail)
         NotificationCenter.default.post(name: .balanceDidChange, object: nil)
         return true
     }
@@ -279,6 +292,17 @@ class DbService: ObservableObject {
         recordTransaction(amount: amount, from: source, for: user, type: "debit")
         recordTransaction(amount: amount, from: destination, for: user, type: "credit")
         context.saveData()
+        let destBank: String = {
+            if let b = destination.bankName, !b.isEmpty { return b }
+            return "account"
+        }()
+        let destDetail: String = {
+            if let no = destination.account_no, no.count >= 4 {
+                return "to \(destBank) ••\(no.suffix(4))"
+            }
+            return "to \(destBank)"
+        }()
+        NotificationManager.shared.notifyDebit(amount: amount, from: source, detail: destDetail)
         NotificationCenter.default.post(name: .balanceDidChange, object: nil)
         return true
     }

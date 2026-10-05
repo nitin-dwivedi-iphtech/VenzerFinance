@@ -14,6 +14,7 @@ struct CurrencyConverterView: View {
     @State private var toCountryCurrency: Country = .usa
     @State private var dragOffset: CGFloat = 0
     @State private var isConverted: Bool = false
+    @State private var showRateError = false
     
     @StateObject private var viewModel = CurrencyConverterViewModel()
 
@@ -34,6 +35,12 @@ struct CurrencyConverterView: View {
                 }
                 
                 expenseText
+
+                if !viewModel.hasValidRate && !viewModel.isLoading {
+                    Text("Rate unavailable. Check connection and try again.")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.red)
+                }
 
                 swipeActionView
                 
@@ -277,14 +284,15 @@ struct CurrencyConverterView: View {
             let buttonDiameter: CGFloat = 44
             let leadPadding: CGFloat = 6
             let maxDragWidth = geometry.size.width - buttonDiameter - (leadPadding * 2)
+            let isDisabled = !viewModel.canConvert
             
             ZStack(alignment: .leading) {
-                Text(isConverted ? "Converted!" : "Swipe")
+                Text(isConverted ? "Converted!" : (viewModel.isLoading ? "Loading rate…" : "Swipe"))
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.white)
                     .opacity(1 - Double(dragOffset / (maxDragWidth * 0.7)))
                     .frame(maxWidth: .infinity, minHeight: 56)
-                    .background(Color("CardColor"), in: Capsule())
+                    .background(isDisabled ? Color.gray.opacity(0.4) : Color("CardColor"), in: Capsule())
                 
                 Circle()
                     .fill(Color.white)
@@ -299,23 +307,29 @@ struct CurrencyConverterView: View {
                     .gesture(
                         DragGesture()
                             .onChanged { value in
+                                guard !isDisabled else { return }
                                 if value.translation.width > 0 && value.translation.width <= maxDragWidth {
                                     dragOffset = value.translation.width
                                 }
                             }
                             .onEnded { value in
+                                guard !isDisabled else { dragOffset = 0; return }
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     if value.translation.width > maxDragWidth * 0.7 {
                                         dragOffset = maxDragWidth
-                                        isConverted = true
-                                        viewModel.applyConversion(from: fromCountryCurrency, to: toCountryCurrency)
-
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                            withAnimation(.easeInOut) {
-                                                dragOffset = 0
-                                                isConverted = false
-                                                dismiss()
+                                        let ok = viewModel.applyConversion(from: fromCountryCurrency, to: toCountryCurrency)
+                                        if ok {
+                                            isConverted = true
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                                withAnimation(.easeInOut) {
+                                                    dragOffset = 0
+                                                    isConverted = false
+                                                    dismiss()
+                                                }
                                             }
+                                        } else {
+                                            dragOffset = 0
+                                            showRateError = true
                                         }
                                     } else {
                                         dragOffset = 0
@@ -327,6 +341,11 @@ struct CurrencyConverterView: View {
         }
         .frame(height: 56)
         .padding(.horizontal, 30)
+        .alert("Conversion failed", isPresented: $showRateError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Rate unavailable or balance too low to cover the fee.")
+        }
     }
 }
 

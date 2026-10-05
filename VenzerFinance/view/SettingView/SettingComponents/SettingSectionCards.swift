@@ -276,7 +276,7 @@ struct AccountDetailsCard: View {
 // Preferences
 struct PreferencesCard: View {
     var user: User?
-    @State private var pushOn = true
+    @AppStorage(NotificationManager.debitNotificationsKey) private var debitNotificationsOn = true
     @AppStorage("forceDarkMode") private var forceDarkMode = false
     
     var body: some View {
@@ -285,11 +285,19 @@ struct PreferencesCard: View {
                 HStack(spacing: 12) {
                     Circle().fill(Color.white).frame(width: 30, height: 30)
                         .overlay(Image(systemName: "bell.badge.fill").foregroundColor(Color("CardColor")))
-                    Text("Push Notifications").font(.system(size: 13))
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Debit Alerts").font(.system(size: 13))
+                        Text("Notify when money is debited").font(.system(size: 11)).foregroundColor(.gray)
+                    }
                     Spacer()
-                    Toggle("", isOn: $pushOn).labelsHidden().tint(Color("CardColor"))
+                    Toggle("", isOn: $debitNotificationsOn).labelsHidden().tint(Color("CardColor"))
                 }
                 .padding(10)
+                .onChange(of: debitNotificationsOn) { _, isOn in
+                    if isOn {
+                        Task { await NotificationManager.shared.requestAuthorization() }
+                    }
+                }
                 SimpleDivider()
                 HStack(spacing: 12) {
                     Circle().fill(Color.white).frame(width: 30, height: 30)
@@ -338,9 +346,4 @@ struct AppVersionFooter: View {
             .font(.system(size: 10)).foregroundColor(.gray.opacity(0.7))
             .frame(maxWidth: .infinity).padding(.top, 4)
     }
-}
-
-struct SupportAndLogoutView: View {
-    var onLogout: () -> Void
-    var body: some View { AppVersionFooter() }
 }
