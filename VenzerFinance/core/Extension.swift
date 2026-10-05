@@ -69,3 +69,14 @@ extension View {
         modifier(SettingInsetModifier(opacity: opacity, radius: radius))
     }
 }
+
+
+extension NotificationManager: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        [.banner, .list, .sound]
+    }
+
+}

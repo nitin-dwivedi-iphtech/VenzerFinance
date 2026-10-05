@@ -13,12 +13,19 @@ struct VenzerFinanceApp: App {
     let persistenceController = PersistenceController.shared
     @AppStorage("forceDarkMode") private var forceDarkMode = false
 
+    init() {
+        _ = NotificationManager.shared
+    }
+
     var body: some Scene {
         WindowGroup {
             SplashScreen()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(AppState.shared)
                 .preferredColorScheme(forceDarkMode ? .dark : nil)
+                .task {
+                    NotificationManager.shared.requestAuthorizationIfNeeded()
+                }
         }
     }
 }

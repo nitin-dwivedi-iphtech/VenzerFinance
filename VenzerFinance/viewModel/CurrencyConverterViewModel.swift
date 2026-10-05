@@ -51,25 +51,30 @@ class CurrencyConverterViewModel: ObservableObject {
     }
 
     func getConvertedValue(from: Country, to: Country) -> String {
-        Helper.ExchangeRateHelper.calculate(
+        guard rate > 0 else { return "—" }
+        return Helper.ExchangeRateHelper.calculate(
             for: accountBalance,
             rate: rate,
             fromCountry: from,
             toCountry: to
-        ) ?? "0.00"
+        ) ?? "—"
     }
+
+    var hasValidRate: Bool { rate > 0 }
+
+    var canConvert: Bool { accountBalance > 0 && hasValidRate && !isLoading }
 
     @discardableResult
     func applyConversion(from: Country, to: Country) -> Bool {
         guard let account = DbService.shared.fetchAccount(for: AppState.shared.user) else { return false }
         let balance = account.balance
-        guard balance > 0 else { return false }
+        guard balance > 0, rate > 0, !isLoading else { return false }
         guard let convertedStr = Helper.ExchangeRateHelper.calculate(
             for: balance,
             rate: rate,
             fromCountry: from,
             toCountry: to
-        ), let converted = Double(convertedStr) else { return false }
+        ), let converted = Double(convertedStr), converted > 0 else { return false }
         let ok = DbService.shared.applyCurrencyConversion(
             account: account,
             convertedAmount: converted,
@@ -87,8 +92,12 @@ class CurrencyConverterViewModel: ObservableObject {
         }
 
         isLoading = true
-        if let fetchedRate = await ApiService.shared.fetchCurrencyRates(for: from.currencyCode, to: to.currencyCode) {
+        rate = 0
+        if let fetchedRate = await ApiService.shared.fetchCurrencyRates(for: from.currencyCode, to: to.currencyCode),
+           fetchedRate > 0 {
             self.rate = fetchedRate
+        } else {
+            self.rate = 0
         }
         isLoading = false
     }

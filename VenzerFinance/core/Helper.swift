@@ -15,7 +15,7 @@ enum Helper {
     enum ExchangeRateHelper {
         
         static func calculate(for amount: Double?, rate: Double?, fromCountry: Country, toCountry: Country) -> String? {
-            guard let amount = amount, let rate = rate else { return nil }
+            guard let amount = amount, let rate = rate, rate > 0 else { return nil }
             
             let fee = rawConversionFee(for: fromCountry, to: toCountry)
             let result = (amount * rate) - fee
